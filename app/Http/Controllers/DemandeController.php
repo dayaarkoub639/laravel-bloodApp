@@ -1,0 +1,108 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Demande;
+use App\Models\Groupage;
+use App\Models\User;
+ 
+
+class DemandeController extends Controller
+{
+    public function demande(){
+        $demandes = Demande::all() ;
+        return view('demandes.list-demandes',compact('demandes'));
+    }
+    public function add(){
+        $listeGroupage= Groupage::all(); 
+        $users=User::all();
+        return view('demandes.add',compact('users','listeGroupage'));
+     }
+
+   
+    /**
+     * Enregistre une nouvelle demande.
+     */
+    public function store(Request $request)
+    {
+        // Validation des données
+        $request->validate([
+            'dateDemande' => 'required|date',
+           
+            'lieuDemande' => 'required|string|max:255',
+            'serviceMedical' => 'required|string|max:255',
+            'groupageDemande' => 'required|exists:groupage,id',
+            'quantiteDemande' => 'required|integer|min:1',
+           
+            'typeMaladie' => 'required|string|max:255',
+            'idDemandeur' => 'required',
+            'numeroDossierMedical' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        // Création de la demande
+        Demande::create([
+            'dateDemande' => $request->dateDemande,
+            'lieuDemande' => $request->lieuDemande,
+            'serviceMedical' => $request->serviceMedical,
+            'groupageDemande' => $request->groupageDemande,
+            'quantiteDemande' => $request->quantiteDemande,
+            'typeMaladie' => $request->typeMaladie,
+            'idDemandeur' => $request->idDemandeur,
+            'numeroDossierMedical' => $request->numeroDossierMedical,
+            'notes' => $request->notes,
+        ]);
+
+        return redirect()->route('demandes.liste')->with('success', 'Demande ajoutée avec succès.');
+    }
+       
+        public function edit($id)
+        {
+            $demande = Demande::findOrFail($id);
+            $users = User::all(); // Liste des utilisateurs
+            $listeGroupage = Groupage::all(); // Liste des groupages sanguins
+            return view('demandes.edit', compact('demande', 'users', 'listeGroupage'));
+        }
+
+       
+        public function update(Request $request, $id)
+        {
+            try{    
+            // Validation des données
+            $request->validate([
+                'dateDemande' => 'required|date',
+                 
+                'lieuDemande' => 'required|string|max:255',
+                'serviceMedical' => 'required|string|max:255',
+                'groupageDemande' => 'required|exists:groupage,id',
+                'quantiteDemande' => 'required|integer|min:1',
+               
+                'typeMaladie' => 'required|string|max:255',
+                'idDemandeur' => 'required',
+                'numeroDossierMedical' => 'nullable|string|max:255',
+                'notes' => 'nullable|string',
+            ]);
+
+            // Récupération et mise à jour
+            $demande = Demande::findOrFail($id);
+            $demande->update($request->all());
+
+            return redirect()->route('demandes.liste')->with('success', 'Demande mise à jour avec succès.');
+            } catch (\Exception $e) {
+                return redirect()->route('demandes.liste')->with('error', $e->getMessage());
+            }
+        }
+
+        public function destroy($id)
+        {
+            try{     
+                $demande = Demande::findOrFail($id);
+                $demande->delete();
+                
+                return redirect()->route('demandes.liste')->with('success', 'Demande supprimé avec succès !');
+            } catch (\Exception $e) {
+                return redirect()->route('demandes.liste')->with('error', $e->getMessage());
+            }
+        }
+}

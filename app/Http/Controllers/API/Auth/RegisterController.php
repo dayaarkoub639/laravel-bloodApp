@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\API\Auth;
 
 use App\Constants\AuthConstants;
- 
+
 use App\Http\Controllers\Controller;
- 
+
 use App\Http\Traits\HttpResponses;
 use App\Models\User;
 use App\Models\Personne;
@@ -20,7 +20,7 @@ class RegisterController extends Controller
     use HttpResponses;
     public static function generateCustomId($wilaya_domicile_id, $gender)
     {
-      
+
         $part3 = str_pad(self::getNextSequence() , 5, '0', STR_PAD_LEFT); // Numéro séquentiel sur 5 digits
         $part2 = str_pad($wilaya_domicile_id, 2, '0', STR_PAD_LEFT); // De 01 à 58
         return "{$gender}{$part2}{$part3}";
@@ -33,7 +33,7 @@ class RegisterController extends Controller
         if (!$lastRecord) {
             return 1;
         }
-        
+
         $lastId = substr($lastRecord->idUser, -5); // Extraire les 5 derniers chiffres
         return (int) $lastId + 1;
     }
@@ -50,7 +50,7 @@ class RegisterController extends Controller
                 'exists' => $exists
             ]);
 
-        } catch (\Exception $e) { 
+        } catch (\Exception $e) {
             // Log l'erreur pour le débogage
             Log::error('Erreur   : ' . $e->getMessage());
 
@@ -68,15 +68,15 @@ class RegisterController extends Controller
         try {
             // Valider les données d'entrée
             $validated = $request->validate([
-               
-                'numeroTlp1' => 'nullable|string|max:15|unique:personne,numeroTlp1',
+
+                'numeroTlp1' => 'nullable|string|max:15|unique:personnes,numeroTlp1',
                 'numeroTlp2' => 'nullable|string|max:15',
-             
+
                 'motDePasse' => 'required|string|min:6',
                 'dateDeNess' => 'nullable|date',
                // 'nom' => 'nullable|string|max:255',
                 //'prenom' => 'nullable|string|max:255',
-                'gender' => 'required|integer', 
+                'gender' => 'required|integer',
                 //'idPhenotype' => 'nullable|integer',
                 'idGroupage' => 'nullable|string',
                 'wilaya_prof_id' => 'nullable|integer',
@@ -84,14 +84,14 @@ class RegisterController extends Controller
                 'wilaya_domicile_id' => 'nullable|integer',
                 'commune_domicile_id' => 'nullable|integer',
                 'pseudo' => 'required|string|min:4',
-                
-                
+
+
             ]);
             $idCustom = self::generateCustomId($validated['wilaya_domicile_id'], $validated['gender']) ;
             // dd($idCustom);
             // Commencer une transaction
             \DB::beginTransaction();
-            
+
             $idGroupage = \App\Models\Groupage::where('type', $validated['idGroupage'])->value('id');
             $accept_sendsms=0;
             if(isset($request->accept_sendsms)){
@@ -111,14 +111,14 @@ class RegisterController extends Controller
                 'gender' => $validated['gender'],
                 'typePersonne' => "user",
                 //'idPhenotype' => $validated['idPhenotype'],
-                'idGroupage' => $idGroupage, 
-                'wilaya_prof_id' => $validated['wilaya_prof_id'], 
-                'commune_prof_id' => $validated['commune_prof_id'], 
-                'wilaya_domicile_id' => $validated['wilaya_domicile_id'], 
-                'commune_domicile_id' => $validated['commune_domicile_id'], 
-              
-                
-               
+                'idGroupage' => $idGroupage,
+                'wilaya_prof_id' => $validated['wilaya_prof_id'],
+                'commune_prof_id' => $validated['commune_prof_id'],
+                'wilaya_domicile_id' => $validated['wilaya_domicile_id'],
+                'commune_domicile_id' => $validated['commune_domicile_id'],
+
+
+
             ]);
 
             // Créer une entrée dans la table `users`
@@ -148,7 +148,7 @@ class RegisterController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
-    }   
-    
-  
+    }
+
+
 }

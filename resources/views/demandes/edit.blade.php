@@ -55,7 +55,7 @@
 
       
         <div class="mb-3">
-            <label for="typeMaladie" class="form-label">Type de demande</label>
+            <label for="typeMaladie" class="form-label">Type de maladie</label>
             <input type="text" class="form-control" id="typeMaladie" name="typeMaladie" value="{{ $demande->typeMaladie }}" required>
         </div>
 

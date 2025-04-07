@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Personne;
 use App\Models\Commune;
 use App\Models\Don;
+use App\Models\Demande;
 
 class Personne extends  Authenticatable
 {
@@ -88,5 +89,9 @@ class Personne extends  Authenticatable
         return $this->hasMany(Don::class, 'idDonneur', 'idUser');
     }
 
-
+    public function demandes()
+    {
+        return $this->belongsToMany(Demande::class, 'demande_personne', 'personne_id', 'demande_id')
+                    ->withTimestamps();
+    }
 }

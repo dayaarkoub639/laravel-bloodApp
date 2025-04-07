@@ -76,7 +76,7 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link {{ request()->is('historique*') ? 'active' : '' }}" href="./sample-page.html" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->is('historique*') ? 'active' : '' }}"  href="{{ route('historique') }}"aria-expanded="false">
                         <span><i class="ti ti-timeline"></i></span>
                         <span class="hide-menu">Historique</span>
                     </a>

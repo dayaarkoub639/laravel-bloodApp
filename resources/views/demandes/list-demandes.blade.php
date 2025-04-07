@@ -197,7 +197,7 @@
                       ?>
 
                       <span class="  fw-semibold">
-                         {{ $demande->nbreAccepte}}  Accepté
+                      ({{count($demande->personnes)}})  Accepté
                       </span>
                       </td>
                       <td class="border-bottom-0">
@@ -213,6 +213,8 @@
                         </div>
                       </td> 
                       <td class="border-bottom-0"> 
+                      <a href="{{ url('demandes/acceptees', $demande->id) }}"  class="btn btn-sm">
+                      <i  style="font-size:20px;color:blue;" class="ti ti-eye"></i></a>
                           <a href="{{ route('demandes.modifier', $demande->id) }}"  class="btn btn-sm">
                             <i  style="font-size:20px;color:blue;" class="ti ti-pencil"></i></a>
                     

@@ -65,7 +65,116 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-            <!--ICi recherche-->
+            <!--ICi recherche TODO-->
+            <div class="accordion mb-4" id="filterAccordion">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingFilters">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilters" aria-expanded="true" aria-controls="collapseFilters">
+        Recherche avancée
+      </button>
+    </h2>
+    <div id="collapseFilters" class="accordion-collapse collapse show" aria-labelledby="headingFilters" data-bs-parent="#filterAccordion">
+      <div class="accordion-body">
+        <div class="container">
+          <!-- Recherche -->
+          <div class="mb-4">
+            <label for="search-input" class="form-label">Rechercher un membre</label>
+            <div class="input-group">
+              <input
+                class="form-control"
+                type="search"
+                id="search-input"
+                placeholder="Chercher par nom, prenom ou pseudo ..." />
+              <button class="btn btn-primary" id="search">Chercher</button>
+            </div>
+          </div>
+
+          <!-- Filtres -->
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label for="groupage" class="form-label">Groupage</label>
+              <select id='groupage' name='groupage' class="form-select">
+                <option value=''>Choisir le groupage</option>
+                @foreach ($listeGroupage as $key => $value)
+                <option value='{!! $value->id !!}'>{!! $value->type !!}</option>
+                @endforeach
+
+            </select> 
+            </div>
+
+            <div class="col-md-2">
+              <label for="c_select" class="form-label">C</label>
+              <select id="c_select" class="form-select">
+                <option selected disabled>C</option>
+                <option value="1">C+</option>
+                <option value="0">C-</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="e_select" class="form-label">E</label>
+              <select id="e_select" class="form-select">
+                <option selected disabled>E</option>
+                <option value="1"> E+</option>
+                <option value="0">E-</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="c_lower_select" class="form-label">c</label>
+              <select id="c_lower_select" name="c_lower_select" class="form-select">
+                <option selected disabled>c</option>
+                <option value="1">c+</option>
+                <option value="0">c-</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="e_lower_select" class="form-label">e</label>
+              <select id="e_lower_select" class="form-select">
+                <option selected disabled>e</option>
+                <option  value="1">e+</option>
+                <option  value="0">e-</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="kell" class="form-label">Kell</label>
+              <select id="kell" class="form-select">
+                <option selected disabled>Kell</option>
+                <option value="1">Kell+</option>
+                <option value="0">Kell-</option>
+              </select>
+            </div>
+
+           
+ 
+    <div class="form-group col">
+        <label for="wilaya" class="form-label">Wilaya</label>
+        <select id="wilaya" name="wilaya" class="form-select">
+            <option value="">Sélectionner une wilaya</option>
+            @foreach ($listeWilayas as $wilaya)
+                <option value="{{ $wilaya->id }}">{{ $wilaya->name_ascii }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <!-- Sélection de la Commune -->
+    <div class="form-group col">
+        <label for="commune" class="form-label">Commune</label>
+        <select id="commune" name="commune" class="form-select">
+            <option value="">Sélectionner une commune</option>
+        </select>
+    </div>
+ 
+  
+          </div>
+        </div> <!-- /.container -->
+      </div> <!-- /.accordion-body -->
+    </div>
+  </div>
+</div>
+
     <div class="d-flex align-items-stretch">
     <div class="card w-100">
       <div class="card-body p-4">
@@ -125,16 +234,16 @@
                        
                         <h6 class="fw-normal"> 
 
-                        @if($personne->communeDomicile)
-                                {{ $personne->communeDomicile->wilaya_name }} 
+                        @if($personne->commune)
+                                {{ $personne->commune->wilaya_name }} 
                             @else
                               Aucune wilaya associée 
                             @endif  
       </h6>   
                      
                       <span class="fw-normal small">
-                      @if($personne->communeDomicile)
-                                {{ $personne->communeDomicile->commune_name }} 
+                      @if($personne->commune)
+                                {{ $personne->commune->commune_name }} 
                             @else
                               Aucune commune associée 
                             @endif  
@@ -198,7 +307,30 @@
            
       </div>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+       <!-- AJAX pour récupérer les communes dynamiquement -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+   $('#wilaya').change(function() {
+        var wilaya_id = $(this).val();
+       // Convertir le code wilaya en format 01, 02, etc.
+       var wilaya_code = wilaya_id.padStart(2, '0');
+        $('#commune').html('<option value="">Chargement...</option>');
+
+        if (wilaya_code) {
+            $.ajax({
+                url: '/api/communes/' + wilaya_code,
+                type: 'GET',
+                success: function(data) {
+                    $('#commune').html('<option value="">Sélectionner une commune</option>');
+                    $.each(data, function(index, commune) {
+                        $('#commune').append('<option value="' + commune.id + '">' + commune.commune_name + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#commune').html('<option value="">Sélectionner une wilaya d\'abord</option>');
+        }
+    });
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function () {
@@ -223,5 +355,5 @@
         });
     });
 </script>
-
+ 
 @endsection

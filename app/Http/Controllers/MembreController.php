@@ -12,26 +12,31 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
- 
+use Illuminate\Support\Facades\Validator;
 use App\Models\Groupage;
 use App\Models\Wilaya;
 use App\Models\Commune;
 use App\Models\personneMedicale;
 use App\Models\admin;
 use App\Models\Don;
+use App\Models\Centre;
 
 class MembreController extends Controller
 {
    public function membres(){ 
      $users = Personne::with('user')->get() ;
-     return view('membres.list-membres',compact('users'));
+     $listeGroupage= Groupage::all();
+     $listeWilayas= Wilaya::all();
+     $listeCommune= Commune::all();
+     return view('membres.list-membres',compact('users','listeGroupage','listeWilayas','listeCommune'));
    }
 
    public function add(){
       $listeGroupage= Groupage::all();
       $listeWilayas= Wilaya::all();
       $listeCommune= Commune::all();
-      return view('membres.add-member',compact('listeGroupage','listeWilayas','listeCommune'));
+      $listeCentres= Centre::all();
+      return view('membres.add-member',compact('listeGroupage','listeWilayas','listeCommune','listeCentres'));
    }
    public static function generateCustomId($wilaya_domicile_id, $gender)
    {
@@ -58,10 +63,37 @@ class MembreController extends Controller
        
    
        try {
-         /*$request->validate([
+         // Définir les règles de validation
+         $validator = Validator::make($request->all(), [
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-        ]);*/
+            'birthdaydate' => 'required|date',
+            'lieuNaissance' => 'required|string|max:255',
+            'gender' => 'required|in:0,1',
+            'phone01' => 'required|numeric|digits:10',
+            'phone02' => 'nullable|numeric|digits:10',
+            'adresseDomicile' => 'required|string|max:255',
+            'wilayaDomicile' => 'required|exists:wilayas,id',
+            'communeDomicile' => 'required|exists:communes,id',
+            'adresseProfessionnelle' => 'required|string|max:255',
+            'wilayaProfessionnelle' => 'required|exists:wilayas,id',
+            'communeProfessionnelle' => 'required|exists:communes,id',
+            'observations' => 'nullable|string',
+            'groupage' => 'nullable',
+            'phenotypeCmaj' => 'nullable|in:0,1',
+            'phenotypeEmaj' => 'nullable|in:0,1',
+            'phenotypeCmin' => 'nullable|in:0,1',
+            'phenotypeEmin' => 'nullable|in:0,1',
+            'phenotypeKell' => 'nullable|in:0,1',
+            'type_personne' => 'required|in:user,admin,personnelMedical',
+            'motDePasse' => 'required|string|min:8|confirmed',
+            'idCentre' => 'nullable', // Si applicable
+        ]);
+
+        // Si la validation échoue, on retourne les erreurs à la page précédente
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
       
   
          // Commencer une transaction
@@ -103,7 +135,8 @@ class MembreController extends Controller
             'kell' => (int) $request->phenotypeKell, 
             //compte
             'typePersonne' => $request->type_personne,
-            'motDePasse' => Hash::make("password"),
+            'idCentre' => $request->idCentre,
+            'motDePasse' => Hash::make($request->type_personne),
             'accept_sendsms' =>  0,
 
              
@@ -145,10 +178,12 @@ class MembreController extends Controller
          Log::error('Erreur lors de la création de l\'utilisateur : ' . $e->getMessage());
 
          // Retourner une réponse d'erreur
-         return response()->json([
+       return response()->json([
              'message' => 'Une erreur est survenue lors de la création de l\'utilisateur.',
              'error' => $e->getMessage(),
          ], 500);
+
+         //return redirect()->back()->withInput()->withErrors(['error' =>  $e->getMessage()]);
      }
    }
 
@@ -159,7 +194,7 @@ class MembreController extends Controller
       $listeGroupage= Groupage::all();
       $listeWilayas= Wilaya::all();
       $listeCommune= Commune::all();
-        
+      $listeCentres= Centre::all();
       if($personne->typePersonne=="user"){ 
          $sousPersonne = User::where("keyIdUser",$id)->first();
          
@@ -173,7 +208,7 @@ class MembreController extends Controller
        
       }
   
-      return view('membres.edit-member',compact('listeGroupage','listeWilayas','listeCommune',"personne","sousPersonne"));
+      return view('membres.edit-member',compact('listeGroupage','listeWilayas','listeCommune',"personne","sousPersonne","listeCentres"));
    }
 
 
@@ -182,6 +217,8 @@ class MembreController extends Controller
       $request->validate([
          'nom' => 'required|string|max:255',
          'prenom' => 'required|string|max:255',
+         'motDePasse' => 'confirmed', 
+       
      ]);
  
      $personne = Personne::where('idUser', $id)->first();
@@ -207,7 +244,7 @@ class MembreController extends Controller
              'wilaya_prof_id' => $request->wilayaProfessionnelle,
              'lieuNaissance' => $request->lieuNaissance,
              'epouseDe' => $request->epouseDe,
-             
+             'idCentre' => $request->idCentre,
            //groupage
             'idGroupage' => (int)$request->groupage, 
             'cMaj' =>(int) $request->phenotypeCmaj, 
@@ -217,6 +254,7 @@ class MembreController extends Controller
             'kell' => (int)$request->phenotypeKell, 
             //compte
             'typePersonne' => $request->type_personne,
+            'motDePasse' => Hash::make($request->type_personne),
            
 
      ]);

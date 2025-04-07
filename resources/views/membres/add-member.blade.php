@@ -10,7 +10,18 @@
    <button type="submit" class="mx-2 btn btn-sm btn-outline-primary" >  Liste</button>
 </form>
 
- 
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+    @if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ session('error') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
 <form class="row g-3"  method="POST"  action="{{ route('membres.store') }}">
   @csrf
   <div class="col-md-8 pe-5">
@@ -302,7 +313,7 @@
                  Compte Membre
             </div>
             <div class="card-body">
-              <div class="form-group ">
+            <div class="form-group ">
                   <label for="type_personne" class="form-label">Type de personne</label>
                   <select id="type_personne" name="type_personne" class="form-select">
                       <option value="user" selected>Utilisateur</option>
@@ -314,8 +325,41 @@
                           {{ $errors->first('type_personne') }}
                       </small>
                   @endif
-              </div>
-              
+              </div>  <br>
+              <!-- Nouveau champ Mot de passe -->
+<div class="form-group">
+    <label for="motDePasse" class="form-label">Mot de passe</label>
+    <input type="password" id="motDePasse" name="motDePasse" class="form-control @error('motDePasse') is-invalid @enderror" required>
+    
+    @error('motDePasse')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
+<br>
+<!-- Confirmation du mot de passe -->
+<div class="form-group">
+    <label for="motDePasse_confirmation" class="form-label">Confirmer le mot de passe</label>
+    <input type="password" id="motDePasse_confirmation" name="motDePasse_confirmation" class="form-control @error('motDePasse_confirmation') is-invalid @enderror" required>
+    
+    @error('motDePasse_confirmation')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
+              <br>
+              <div class="form-group col mb-3" id="idCentre-container" style="display: none;">
+    <label for="idCentre" class="form-label">Centre</label>
+    <select id="idCentre" name="idCentre" class="form-select @error('idCentre') is-invalid @enderror">
+        <option value="">Sélectionner un centre</option>
+        @foreach ($listeCentres as $centre)
+            <option value="{{ $centre->id }}">
+                {{ $centre->nom }}
+            </option>
+        @endforeach
+    </select>
+    @error('idCentre')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
         <!-- Champs dynamiques -->
         <div class="form-group" id="pseudo_field" style="display: none;">
         <br>
@@ -450,6 +494,23 @@ $(document).ready(function() {
     document.addEventListener("DOMContentLoaded", function() {
         toggleEpouseDe();
     });
+   // Get the form elements
+    const typePersonneSelect = document.getElementById('type_personne');
+    const idCentreContainer = document.getElementById('idCentre-container');
+
+    // Event listener for changes in type_personne dropdown
+    typePersonneSelect.addEventListener('change', function () {
+        if (this.value === 'user') {
+            idCentreContainer.style.display = 'none';  
+        } else {
+            idCentreContainer.style.display = 'block';   
+        }
+    });
+
+    // Initialize the display on page load (in case the form is pre-filled)
+    if (typePersonneSelect.value === 'user') {
+        idCentreContainer.style.display = 'none';
+    }
 </script>
 @endsection
  

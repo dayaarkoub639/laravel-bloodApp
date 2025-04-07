@@ -29,15 +29,18 @@ class CompagnesController extends Controller
      */
     public function store(Request $request)
     {
+       
         $request->validate([
-            'idCentre' => 'required',
+            'id' => 'required',
             'address' => 'required|string|max:255',
             'wilaya' => 'required|integer',
             'commune' => 'required|integer',
             'etablissement' => 'required|string|max:255',
-            'localisation' => 'required|string|max:255',
+          
             'dateDebut' => 'required|date',
             'dateFin' => 'required|date|after_or_equal:dateDebut',
+            'heureDebut' => 'required',
+        'heureFin' => 'required|after:heureDebut',
         ]);
 
         Compagne::create($request->all());
@@ -56,15 +59,18 @@ class CompagnesController extends Controller
 
     public function update(Request $request, $id)
     {
+      
         $request->validate([
             'idCentre' => 'required ',
             'address' => 'required|string|max:255',
             'wilaya' => 'required|integer',
             'commune' => 'required|integer',
             'etablissement' => 'required|string|max:255',
-            'localisation' => 'required|string|max:255',
+         
             'dateDebut' => 'required|date',
             'dateFin' => 'required|date|after_or_equal:dateDebut',
+            'heureDebut' => 'required',
+            'heureFin' => 'required|after:heureDebut',
         ]);
 
         $compagne = Compagne::findOrFail($id);

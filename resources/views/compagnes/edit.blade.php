@@ -72,30 +72,41 @@
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
+ 
 
-        <div class="mb-3">
-            <label for="localisation" class="form-label">Localisation</label>
-            <input type="text" class="form-control @error('localisation') is-invalid @enderror" id="localisation" name="localisation" value="{{ old('localisation', $compagne->localisation) }}" required>
-            @error('localisation')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
+<div class="row mb-3">
+        <div class="col">
             <label for="dateDebut" class="form-label">Date de début</label>
             <input type="date" class="form-control @error('dateDebut') is-invalid @enderror" id="dateDebut" name="dateDebut" value="{{ old('dateDebut', $compagne->dateDebut) }}" required>
             @error('dateDebut')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
+        <div class="col">
+    <label for="heureDebut" class="form-label">Heure de début</label>
+    <input type="time" class="form-control @error('heureDebut') is-invalid @enderror" id="heureDebut" name="heureDebut" value="{{ old('heureDebut', $compagne->heureDebut) }}" required>
+    @error('heureDebut')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
+</div>
 
-        <div class="mb-3">
+<div class="row mb-3">
+        <div class="col">
             <label for="dateFin" class="form-label">Date de fin</label>
             <input type="date" class="form-control @error('dateFin') is-invalid @enderror" id="dateFin" name="dateFin" value="{{ old('dateFin', $compagne->dateFin) }}" required>
             @error('dateFin')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
+        <div class="col">
+    <label for="heureFin" class="form-label">Heure de fin</label>
+    <input type="time" class="form-control @error('heureFin') is-invalid @enderror" id="heureFin" name="heureFin" value="{{ old('heureFin', $compagne->heureFin) }}" required>
+    @error('heureFin')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
+</div>
         <button type="button" class="btn btn-outline-primary" onclick="window.history.back();">Annuler</button>
         <button type="button" class="btn btn-primary mx-3" id="confirm-update">
             Mettre à jour

@@ -15,7 +15,9 @@ class Admin extends Model{
         'pseudo', 
         "keyIdUser"
         ,"idPersonne"
-        ,"acces"      ];
+        ,"acces" ,
+    'idCentre'
+    ];
 
     public function getKeyIdUserAttribute($value)
     {

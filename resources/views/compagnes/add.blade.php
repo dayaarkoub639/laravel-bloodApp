@@ -13,11 +13,11 @@
 
         <div class="form-group col mb-3">
                 <label for="idCentre" class="form-label">Centre</label>
-                <select id="idCentre" name="idCentre" class="form-select @error('idCentre') is-invalid @enderror">
+                <select id="idCentre" name="id" class="form-select @error('idCentre') is-invalid @enderror">
                     <option value="">Sélectionner une centre</option>
                     @foreach ($listeCentres as $centre)
                         <option value="{{ $centre->id }}">
-                            {{ $centre->nom }}
+                            {{ $centre->nom }}  
                         </option>
                     @endforeach
                 </select>
@@ -26,7 +26,20 @@
                 @enderror
             </div>
 
-
+            <div class="form-group col mb-3" id="idCentre-container" style="display: none;">
+    <label for="idCentre" class="form-label">Centre</label>
+    <select id="idCentre" name="idCentre" class="form-select @error('idCentre') is-invalid @enderror">
+        <option value="">Sélectionner un centre</option>
+        @foreach ($listeCentres as $centre)
+            <option value="{{ $centre->id }}">
+                {{ $centre->nom }}
+            </option>
+        @endforeach
+    </select>
+    @error('idCentre')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
         <div class="mb-3">
             <label for="address" class="form-label">Adresse</label>
             <input type="text" class="form-control @error('address') is-invalid @enderror" id="address" name="address" value="{{ old('address') }}" required>
@@ -70,29 +83,42 @@
             @enderror
         </div>
 
-        <div class="mb-3">
-            <label for="localisation" class="form-label">Localisation</label>
-            <input type="text" class="form-control @error('localisation') is-invalid @enderror" id="localisation" name="localisation" value="{{ old('localisation') }}" required>
-            @error('localisation')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
+     
 
-        <div class="mb-3">
+        <div class="row mb-3">
+        <div class="col">
             <label for="dateDebut" class="form-label">Date de début</label>
             <input type="date" class="form-control @error('dateDebut') is-invalid @enderror" id="dateDebut" name="dateDebut" value="{{ old('dateDebut') }}" required>
             @error('dateDebut')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
-
-        <div class="mb-3">
+        <div class="col">
+    <label for="heureDebut" class="form-label">Heure de début</label>
+    <input type="time" class="form-control @error('heureDebut') is-invalid @enderror" id="heureDebut" name="heureDebut" value="{{ old('heureDebut') }}" required>
+    @error('heureDebut')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
+ 
+</div>
+<div class="row mb-3">
+        <div class="col">
+     
             <label for="dateFin" class="form-label">Date de fin</label>
             <input type="date" class="form-control @error('dateFin') is-invalid @enderror" id="dateFin" name="dateFin" value="{{ old('dateFin') }}" required>
             @error('dateFin')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
+        <div class="col">
+    <label for="heureFin" class="form-label">Heure de fin</label>
+    <input type="time" class="form-control @error('heureFin') is-invalid @enderror" id="heureFin" name="heureFin" value="{{ old('heureFin') }}" required>
+    @error('heureFin')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+    </div>
+</div>
 
         <button type="submit" class="btn btn-primary">Ajouter</button> 
     </form>

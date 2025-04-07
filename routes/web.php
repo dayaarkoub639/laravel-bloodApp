@@ -10,6 +10,7 @@ use App\Http\Controllers\StatistiqueController;
 use App\Http\Controllers\CompagnesController;
 use App\Http\Controllers\CentresController;
 use App\Http\Controllers\UrgencesController;
+use App\Http\Controllers\HistoriqueController;
 
 use App\Http\Controllers\DonController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -54,6 +55,8 @@ Route::post('/dashboard', [MainController::class, 'index']);
         Route::get('/modifier/{id}', [DemandeController::class, 'edit'])->name('demandes.modifier');
         Route::put('/modifier/{id}', [DemandeController::class, 'update'])->name('demandes.update');
         Route::get('/fiche/{id}', [DemandeController::class, 'show'])->name('fiche-demande');
+        Route::get('/acceptees/{id}', [DemandeController::class, 'acceptesView'])->name('acceptesView');
+        
         Route::delete('/supprimer/{id}', [DemandeController::class, 'destroy'])->name('demande.delete');
     });
 
@@ -81,6 +84,7 @@ Route::post('/dashboard', [MainController::class, 'index']);
 
     // Urgences
     Route::get('/urgences', [UrgencesController::class, 'index'])->name('urgences');
+    Route::get('/historique', [HistoriqueController::class, 'index'])->name('historique');
     Route::get('/urgences/search', [UrgencesController::class, 'searchByGroupage'])->name('dons.search');
 
     // Statistiques

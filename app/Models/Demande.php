@@ -37,4 +37,9 @@ class Demande extends Model
       {
           return $this->belongsTo(Groupage::class, 'groupageDemande', 'id');
       }
+      public function personnes()
+        {
+            return $this->belongsToMany(Personne::class, 'demande_personne', 'demande_id', 'personne_id')
+                        ->withTimestamps(); // si tu as les timestamps dans la table pivot
+        }
 }

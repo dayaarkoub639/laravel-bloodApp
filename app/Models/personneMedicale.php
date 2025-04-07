@@ -13,7 +13,8 @@ class personneMedicale extends Model{
     protected $fillable = [
         'idPersonne', 
         "fonction",
-        'role'  
+        'role'  ,
+        'idCentre'
     ];
 
     

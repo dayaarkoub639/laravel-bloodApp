@@ -342,25 +342,62 @@
         Compte Membre
     </div>
     <div class="card-body">
-        <div class="form-group">
-            <label for="type_personne" class="form-label">Type de personne</label>
-            <select id="type_personne" name="type_personne" class="form-select">
-                <option value="user" {!! $personne->typePersonne=="user" ? 'selected' : '' !!}>Utilisateur</option>
-                <option value="admin" {!! $personne->typePersonne=="admin" ? 'selected' : '' !!}>Administrateur</option>
-                <option value="personnelMedical" {!! $personne->typePersonne=="personnelMedical" ? 'selected' : '' !!}>Personnel Médical</option>
-            </select>
-            @if ($errors->has('type_personne'))
-                <small class="text text-danger">
-                    {{ $errors->first('type_personne') }}
-                </small>
-            @endif
-        </div>
- 
+     
+        <div class="form-group ">
+                  <label for="type_personne" class="form-label">Type de personne</label>
+                  <select id="type_personne" name="type_personne" class="form-select">
+            
+                    <option value="user" {!! $personne->typePersonne=="user" ? 'selected' : '' !!}>Utilisateur</option>
+                    <option value="admin" {!! $personne->typePersonne=="admin" ? 'selected' : '' !!}>Administrateur</option>
+                    <option value="personnelMedical" {!! $personne->typePersonne=="personnelMedical" ? 'selected' : '' !!}>Personnel Médical</option>
+            
+                  </select>
+                  @if ($errors->has('type_personne'))
+                      <small class="text text-danger">
+                          {{ $errors->first('type_personne') }}
+                      </small>
+                  @endif
+              </div>
+              <br>
+              <!-- Nouveau champ Mot de passe -->
+<div class="form-group">
+    <label for="motDePasse" class="form-label">Mot de passe</label>
+    <input type="password" id="motDePasse" name="motDePasse" class="form-control @error('motDePasse') is-invalid @enderror" required>
+    
+    @error('motDePasse')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
+<br>
+<!-- Confirmation du mot de passe -->
+<div class="form-group">
+    <label for="motDePasse_confirmation" class="form-label">Confirmer le mot de passe</label>
+    <input type="password" id="motDePasse_confirmation" name="motDePasse_confirmation" class="form-control @error('motDePasse_confirmation') is-invalid @enderror" required>
+    
+    @error('motDePasse_confirmation')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
+              <br>
+              <div class="form-group col mb-3" id="idCentre-container"  >
+    <label for="idCentre" class="form-label">Centre</label>
+    <select id="idCentre" name="idCentre" class="form-select @error('idCentre') is-invalid @enderror">
+        <option value="">Sélectionner un centre</option>
+        @foreach ($listeCentres as $centre)
+            <option value="{{ $centre->id }}" {{ old('idCentre', $sousPersonne->idCentre) == $centre->id ? 'selected' : '' }}>
+                {{ $centre->nom }}
+            </option>
+        @endforeach
+    </select>
+    @error('idCentre')
+        <div class="text-danger">{{ $message }}</div>
+    @enderror
+</div>
         <!-- Champs dynamiques -->
         <div class="form-group" id="pseudo_field" style="display: none;">
         <br>
             <label for="pseudo" class="form-label">Pseudo</label>
-            <input type="text" id="pseudo" name="pseudo" class="form-control"  value="{{ old('pseudo', $sousPersonne->pseudo) }}" >
+            <input type="text" id="pseudo" name="pseudo" class="form-control"  value="{{ old('pseudo', $sousPersonne->pseudo ?? '') }}" >
         </div>
 
         <div class="form-group" id="acces_field" style="display: none;">
@@ -411,7 +448,7 @@ $(document).ready(function() {
     
     function loadCivilites(selectedCivilite,   targetSelect) {
        
-        alert(selectedCivilite);
+        
         if (selectedCivilite=="0") {
       
             document.getElementById("epousede_field").value = "epouseField"; 
@@ -593,8 +630,23 @@ $(document).ready(function() {
         }
     }
 
-    // Exécuter au chargement pour garder l'état après validation ou édition
-    document.addEventListener("DOMContentLoaded", toggleEpouseDe);
+   
+    const typePersonneSelect = document.getElementById('type_personne');
+    const idCentreContainer = document.getElementById('idCentre-container');
+
+    // Event listener for changes in type_personne dropdown
+    typePersonneSelect.addEventListener('change', function () {
+        if (this.value === 'user') {
+            idCentreContainer.style.display = 'none';  
+        } else {
+            idCentreContainer.style.display = 'block';   
+        }
+    });
+
+    // Initialize the display on page load (in case the form is pre-filled)
+    if (typePersonneSelect.value === 'user') {
+        idCentreContainer.style.display = 'none';
+    }
 </script>
 @endsection
  

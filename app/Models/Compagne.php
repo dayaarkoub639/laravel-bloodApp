@@ -18,7 +18,8 @@ class Compagne extends Model
         'wilaya',
         'commune',
         'etablissement',
-        'localisation',
+        'heureDebut',
+        'heureFin',
         'dateDebut',
         'dateFin',
     ];

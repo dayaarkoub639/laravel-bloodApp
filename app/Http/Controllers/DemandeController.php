@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Demande;
+use App\Models\Personne;
 use App\Models\Groupage;
-use App\Models\User;
+use App\Models\User; 
+
+
  
 
 class DemandeController extends Controller
 {
     public function demande(){
-        $demandes = Demande::all() ;
+        $demandes = Demande::with('personnes')->get() ;
         return view('demandes.list-demandes',compact('demandes'));
     }
     public function add(){
@@ -52,6 +55,7 @@ class DemandeController extends Controller
             'idDemandeur' => $request->idDemandeur,
             'numeroDossierMedical' => $request->numeroDossierMedical,
             'notes' => $request->notes,
+            'typeDemande' => "rendez vous",
         ]);
 
         return redirect()->route('demandes.liste')->with('success', 'Demande ajoutée avec succès.');
@@ -63,6 +67,16 @@ class DemandeController extends Controller
             $users = User::all(); // Liste des utilisateurs
             $listeGroupage = Groupage::all(); // Liste des groupages sanguins
             return view('demandes.edit', compact('demande', 'users', 'listeGroupage'));
+        }
+        public function acceptesView($id)
+        { 
+    
+        //$donneurs = Personne::with('user')->get() ;
+       // $donneurs = DemandePersonne::get();
+      //  $donneurs = Personne::with('demandes')->findOrFail($id);
+      $donneurs = Demande::with('personnes')->findOrFail($id);
+ 
+            return view('demandes.acceptes',compact("donneurs"));
         }
 
        

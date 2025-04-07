@@ -1,6 +1,6 @@
 <?php
 
- 
+
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DemandeController;
@@ -20,23 +20,25 @@ Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
 })->name('index');
 
-   
+
 // Routes protégées par auth et vérification email
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Définir une route qui pointe vers MainController@index
-Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
-Route::post('/dashboard', [MainController::class, 'index']);
- // Membres
- Route::prefix('membres')->group(function () {
-    Route::get('/', [MembreController::class, 'membres'])->name('membres');
-    Route::get('/ajouter', [MembreController::class, 'add'])->name('ajouter-membre');
-    Route::post('/ajouter', [MembreController::class, 'store'])->name('membres.store');
-    Route::get('/modifier/{id}', [MembreController::class, 'edit'])->name('modifier-membre');
-    Route::put('/modifier/{id}', [MembreController::class, 'update'])->name('membres.update');
-    Route::get('/fiche/{id}', [MembreController::class, 'show'])->name('fiche-membre');
-    Route::delete('/supprimer/{id}', [MembreController::class, 'destroy'])->name('membre.delete');
-});
+    Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard', [MainController::class, 'index']);
+    // Membres
+    Route::prefix('membres')->group(function () {
+        Route::get('/', [MembreController::class, 'membres'])->name('membres');
+        Route::get('/ajouter', [MembreController::class, 'add'])->name('ajouter-membre');
+        Route::post('/ajouter', [MembreController::class, 'store'])->name('membres.store');
+        Route::get('/modifier/{id}', [MembreController::class, 'edit'])->name('modifier-membre');
+        Route::put('/modifier/{id}', [MembreController::class, 'update'])->name('membres.update');
+        Route::get('/fiche/{id}', [MembreController::class, 'show'])->name('fiche-membre');
+        Route::delete('/supprimer/{id}', [MembreController::class, 'destroy'])->name('membre.delete');
+        Route::post('/searchAdvanced', [MembreController::class, 'searchAdvanced'])->name('membres.searchAdvanced');
+
+    });
     // Dons
     Route::prefix('dons')->group(function () {
         Route::get('/liste', [DonController::class, 'searchByGroupageView'])->name('dons.list');
@@ -56,7 +58,7 @@ Route::post('/dashboard', [MainController::class, 'index']);
         Route::put('/modifier/{id}', [DemandeController::class, 'update'])->name('demandes.update');
         Route::get('/fiche/{id}', [DemandeController::class, 'show'])->name('fiche-demande');
         Route::get('/acceptees/{id}', [DemandeController::class, 'acceptesView'])->name('acceptesView');
-        
+
         Route::delete('/supprimer/{id}', [DemandeController::class, 'destroy'])->name('demande.delete');
     });
 
@@ -88,18 +90,14 @@ Route::post('/dashboard', [MainController::class, 'index']);
     Route::get('/urgences/search', [UrgencesController::class, 'searchByGroupage'])->name('dons.search');
 
     // Statistiques
-    Route::get('/statistiques', [StatistiqueController::class, 'statistique'])->name('statistique');
-
-   
+    Route::get('/statistiques', [StatistiqueController::class, 'statistique'])->name('statistiques');
 });
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
- 
- 
+/*
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
- 
+});*/

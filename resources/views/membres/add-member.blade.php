@@ -3,14 +3,14 @@
 @include('layouts.public.header')
 
 <div class="container-fluid">
-      
-            
-<form class="card-title fw-semibold mb-4" action="{{route('membres')}}">
-    Ajouter un membre
-   <button type="submit" class="mx-2 btn btn-sm btn-outline-primary" >  Liste</button>
-</form>
 
-@if (session('success'))
+
+    <form class="card-title fw-semibold mb-4" action="{{route('membres')}}">
+        Ajouter un membre
+        <button type="submit" class="mx-2 btn btn-sm btn-outline-primary"> Liste</button>
+    </form>
+
+    @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -18,397 +18,404 @@
     @endif
     @if (session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ session('error') }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
-<form class="row g-3"  method="POST"  action="{{ route('membres.store') }}">
-  @csrf
-  <div class="col-md-8 pe-5">
-  <div class="card">
-            <div class="card-header">
-                 Informations générales
+    <form class="row g-3" method="POST" action="{{ route('membres.store') }}">
+        @csrf
+        <div class="col-md-8 pe-5">
+            <div class="card">
+                <div class="card-header">
+                    Informations générales
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="form-group col">
+                            <label for="nom" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="nom" name="nom">
+                            @if ($errors->has('nom'))
+                            <small class="text text-danger">
+                                {{ $errors->first('nom') }}
+                            </small>
+                            @endif
+                        </div>
+
+                        <div class="form-group col">
+                            <label for="prenom" class="form-label">Prénom</label>
+                            <input type="text" class="form-control" id="prenom" name="prenom">
+                            @if ($errors->has('prenom'))
+                            <small class="text text-danger">
+                                {{ $errors->first('prenom') }}
+                            </small>
+                            @endif
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+
+                        <div class="form-group col">
+                            <label for="birthdaydate" class="form-label">Date de naissance</label>
+                            <input type="date" class="form-control" id="birthdaydate" name="birthdaydate">
+                            @if ($errors->has('birthdaydate'))
+                            <small class="text text-danger">
+                                {{ $errors->first('birthdaydate') }}
+                            </small>
+                            @endif
+                        </div>
+
+                        <div class="form-group col">
+                            <label for="lieuNaissance" class="form-label">Lieu de naissance</label>
+                            <input type="text" id="lieuNaissance" name="lieuNaissance" class="form-control"
+                                value="{{ old('lieuNaissance') }}">
+                        </div>
+
+
+                    </div> <br>
+                    <div class="row">
+
+
+                        <div class="form-group col">
+                            <label for="gender" class="form-label">Civilité *</label>
+                            <select id="gender" name="gender" class="form-select" onchange="toggleEpouseDe()">
+                                <option value="">Sélectionner la civilité *</option>
+                                <option value="1">Homme</option>
+                                <option value="0">Femme</option>
+                            </select>
+                            @if ($errors->has('gender'))
+                            <small class="text text-danger">
+                                {{ $errors->first('gender') }}
+                            </small>
+                            @endif
+                        </div>
+
+                        <div class="form-group col" id="epousede_field" style="display: none;">
+                            <label for="epousede" class="form-label">Épouse de</label>
+                            <input type="text" id="epousede" name="epouseDe" class="form-control"
+                                value="{{ old('epousede') }}">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="form-group col">
+                            <label for="phone01" class="form-label">Téléphone principale</label>
+                            <input type="number" class="form-control" id="phone01" name="phone01">
+                            @if ($errors->has('phone01'))
+                            <small class="text text-danger">
+                                {{ $errors->first('phone01') }}
+                            </small>
+                            @endif
+                        </div>
+
+                        <div class="form-group col">
+                            <label for="phone02" class="form-label">Téléphone secondaire </label>
+                            <input type="number" class="form-control" id="phone02" name="phone02">
+                            @if ($errors->has('phone02'))
+                            <small class="text text-danger">
+                                {{ $errors->first('phone02') }}
+                            </small>
+                            @endif
+                        </div>
+                    </div>
+                    <br>
+
+
+                    <div class="form-group">
+                        <label for="adresseDomicile" class="form-label">Adresse (Domicile)</label>
+                        <textarea class="form-control" id="adresseDomicile" name="adresseDomicile"></textarea>
+                        @if ($errors->has('adresseDomicile'))
+                        <small class="text text-danger">
+                            {{ $errors->first('adresseDomicile') }}
+                        </small>
+                        @endif
+                    </div>
+                    <br>
+                    <div class="row">
+                        <!-- Sélection de la Wilaya -->
+                        <div class="form-group col">
+                            <label for="wilayaDomicile" class="form-label">Wilaya (Domicile) *</label>
+                            <select id="wilayaDomicile" name="wilayaDomicile" class="form-select">
+                                <option value="">Sélectionner une wilaya</option>
+                                @foreach ($listeWilayas as $wilaya)
+                                <option value="{{ $wilaya->id }}">{{ $wilaya->name_ascii }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Sélection de la Commune -->
+                        <div class="form-group col">
+                            <label for="communeDomicile" class="form-label">Commune (Domicile)</label>
+                            <select id="communeDomicile" name="communeDomicile" class="form-select">
+                                <option value="">Sélectionner une commune</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="adresseProfessionnelle" class="form-label">Adresse (Professionnelle)</label>
+                        <textarea class="form-control" id="adresseProfessionnelle"
+                            name="adresseProfessionnelle"></textarea>
+                        @if ($errors->has('adresseProfessionnelle'))
+                        <small class="text text-danger">
+                            {{ $errors->first('adresseProfessionnelle') }}
+                        </small>
+                        @endif
+                    </div>
+                    <br>
+
+                    <div class="row">
+                        <!-- Sélection de la Wilaya -->
+                        <div class="form-group col">
+                            <label for="wilayaProfessionnelle" class="form-label">Wilaya (Professionnelle)</label>
+                            <select id="wilayaProfessionnelle" name="wilayaProfessionnelle" class="form-select">
+                                <option value="">Sélectionner une wilaya</option>
+                                @foreach ($listeWilayas as $wilaya)
+                                <option value="{{ $wilaya->id }}">{{ $wilaya->name_ascii }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Sélection de la Commune -->
+                        <div class="form-group col">
+                            <label for="communeProfessionnelle" class="form-label">Commune (Professionnelle)</label>
+                            <select id="communeProfessionnelle" name="communeProfessionnelle" class="form-select">
+                                <option value="">Sélectionner une commune</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <br>
+
+
+                    <div class="form-group mb-3">
+                        <label for="observations" class="form-label">Observations médicales</label>
+                        <textarea class="form-control" id="observations" name="observations"></textarea>
+                        @if ($errors->has('observations'))
+                        <small class="text text-danger">
+                            {{ $errors->first('observations') }}
+                        </small>
+                        @endif
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-  <div class="row">
-<div class="form-group col">
-    <label for="nom" class="form-label">Nom</label>
-    <input type="text"  class="form-control" id="nom" name="nom">
-    @if ($errors->has('nom'))
-      <small class="text text-danger">
-          {{ $errors->first('nom') }}
-      </small>
-    @endif
-  </div>
-   
-  <div class="form-group col">
-    <label for="prenom" class="form-label">Prénom</label>
-    <input type="text"  class="form-control" id="prenom" name="prenom">
-    @if ($errors->has('prenom'))
-      <small class="text text-danger">
-          {{ $errors->first('prenom') }} 
-      </small>
-    @endif
-  </div>
-  </div>
-  <br> 
-  <div class="row">
 
-  <div class="form-group col">
-    <label for="birthdaydate" class="form-label">Date de naissance</label>
-    <input type="date"  class="form-control" id="birthdaydate" name="birthdaydate">
-    @if ($errors->has('birthdaydate'))
-      <small class="text text-danger">
-          {{ $errors->first('birthdaydate') }}
-      </small>
-    @endif
-  </div>
- 
-<div class="form-group col">
-    <label for="lieuNaissance" class="form-label">Lieu de naissance</label>
-    <input type="text" id="lieuNaissance" name="lieuNaissance" class="form-control" value="{{ old('lieuNaissance') }}">
-</div>
-
-
-      </div>  <br> 
-  <div class="row">
-  
-     
-  <div class="form-group col">
-    <label for="gender" class="form-label">Civilité *</label>
-    <select id="gender" name="gender" class="form-select" onchange="toggleEpouseDe()">
-        <option value="">Sélectionner la civilité *</option>
-        <option value="1"  >Homme</option>
-        <option value="0" >Femme</option>
-    </select>
-    @if ($errors->has('gender'))
-        <small class="text text-danger">
-            {{ $errors->first('gender') }}
-        </small>
-    @endif
-</div>
-
-<div class="form-group col" id="epousede_field" style="display: none;">
-    <label for="epousede" class="form-label">Épouse de</label>
-    <input type="text" id="epousede" name="epouseDe" class="form-control" value="{{ old('epousede') }}">
-</div>
-  </div>
-  <br> 
-  <div class="row">
-<div class="form-group col">
-    <label for="phone01" class="form-label">Téléphone principale</label>
-    <input type="number"  class="form-control" id="phone01" name="phone01">
-    @if ($errors->has('phone01'))
-      <small class="text text-danger">
-          {{ $errors->first('phone01') }}
-      </small>
-    @endif
-  </div>
- 
-<div class="form-group col">
-    <label for="phone02" class="form-label">Téléphone secondaire </label>
-    <input type="number"  class="form-control" id="phone02" name="phone02">
-    @if ($errors->has('phone02'))
-      <small class="text text-danger">
-          {{ $errors->first('phone02') }}
-      </small>
-    @endif
-  </div>
-  </div>
-<br>
- 
-  
-  <div class="form-group">
-    <label for="adresseDomicile" class="form-label">Adresse (Domicile)</label>
-    <textarea class="form-control" id="adresseDomicile" name="adresseDomicile"></textarea>
-    @if ($errors->has('adresseDomicile'))
-    <small class="text text-danger">
-        {{ $errors->first('adresseDomicile') }}
-    </small>
-@endif
-  </div>
-  <br> 
-  <div class="row">
-    <!-- Sélection de la Wilaya -->
-    <div class="form-group col">
-        <label for="wilayaDomicile" class="form-label">Wilaya (Domicile) *</label>
-        <select id="wilayaDomicile" name="wilayaDomicile" class="form-select">
-            <option value="">Sélectionner une wilaya</option>
-            @foreach ($listeWilayas as $wilaya)
-                <option value="{{ $wilaya->id }}">{{ $wilaya->name_ascii }}</option>
-            @endforeach
-        </select>
-    </div>
-
-    <!-- Sélection de la Commune -->
-    <div class="form-group col">
-        <label for="communeDomicile" class="form-label">Commune (Domicile)</label>
-        <select id="communeDomicile" name="communeDomicile" class="form-select">
-            <option value="">Sélectionner une commune</option>
-        </select>
-    </div>
-</div>
-  <br>
-  <div class="form-group">
-    <label for="adresseProfessionnelle" class="form-label">Adresse (Professionnelle)</label>
-    <textarea class="form-control" id="adresseProfessionnelle" name="adresseProfessionnelle"></textarea>
-    @if ($errors->has('adresseProfessionnelle'))
-    <small class="text text-danger">
-        {{ $errors->first('adresseProfessionnelle') }}
-    </small>
-@endif
-  </div>
-  <br>
-
-  <div class="row">
-    <!-- Sélection de la Wilaya -->
-    <div class="form-group col">
-        <label for="wilayaProfessionnelle" class="form-label">Wilaya (Professionnelle)</label>
-        <select id="wilayaProfessionnelle" name="wilayaProfessionnelle" class="form-select">
-            <option value="">Sélectionner une wilaya</option>
-            @foreach ($listeWilayas as $wilaya)
-                <option value="{{ $wilaya->id }}">{{ $wilaya->name_ascii }}</option>
-            @endforeach
-        </select>
-    </div>
-
-    <!-- Sélection de la Commune -->
-    <div class="form-group col">
-        <label for="communeProfessionnelle" class="form-label">Commune (Professionnelle)</label>
-        <select id="communeProfessionnelle" name="communeProfessionnelle" class="form-select">
-            <option value="">Sélectionner une commune</option>
-        </select>
-    </div>
-</div>
-
- 
-<br>
-  
-  
-  <div class="form-group mb-3">
-    <label for="observations" class="form-label">Observations médicales</label>
-    <textarea class="form-control" id="observations" name="observations"></textarea>
-    @if ($errors->has('observations'))
-    <small class="text text-danger">
-        {{ $errors->first('observations') }}
-    </small>
-@endif
-  </div>
-  </div> </div>
-
-    <div class="col-auto">
-        <button type="submit" class="btn right btn-primary mb-3 py-2 px-4">
-            Ajouter</button>
-    </div>
-</div>
-<div class="col-md-4  ">
- 
-    <div class="col">
-
-    <div class="card">
-            <div class="card-header">
-                 Groupage
+            <div class="col-auto">
+                <button type="submit" class="btn right btn-primary mb-3 py-2 px-4">
+                    Ajouter</button>
             </div>
-            <div class="card-body">
-                      
-        <div class="form-group {{ $errors->has('groupage') ? 'has-error' : '' }} ">
-            <label for="groupage" class="form-label text-center">Groupage</label>
-            <select id='groupage' name='groupage' class="form-select">
-                <option value=''>Choisir le groupage</option>
-                @foreach ($listeGroupage as $key => $value)
-                <option value='{!! $value->id !!}'>{!! $value->type !!}</option>
-                @endforeach
-
-            </select> 
-            @if ($errors->has('groupage'))
-            <small class="text text-danger">
-                {{ $errors->first('groupage') }}
-            </small>
-            @endif
         </div>
-        <br>   <br>
-        <label  class="form-label text-center">Phénotype</label>
+        <div class="col-md-4  ">
 
-      
-        <div class="form-group {{ $errors->has('phenotypeCmaj') ? 'has-error' : '' }} ">
-            <label for="phenotypeCmaj" class="form-label text-center">C</label>
-            <select id='phenotypeCmaj' name='phenotypeCmaj' class="form-select">
-                <option value=''>Choisir +/-</option>
-                <option value="1"  >+</option>
-                <option value="0"  >-</option>
-            </select>
+            <div class="col">
 
-            @if ($errors->has('phenotypeCmaj'))
-            <small class="text text-danger">
-                {{ $errors->first('phenotypeCmaj') }}
-            </small>
-            @endif
-         </div>
-     
-         <br>
-         <div class="form-group {{ $errors->has('phenotypeEmaj') ? 'has-error' : '' }} ">
-            <label for="phenotypeEmaj" class="form-label text-center">E</label>
-            <select id='phenotypeEmaj' name='phenotypeEmaj' class="form-select">
-                <option value=''>Choisir +/-</option>
-                <option value="1"  >+</option>
-                <option value="0"  >-</option>
-            </select>
+                <div class="card">
+                    <div class="card-header">
+                        Groupage
+                    </div>
+                    <div class="card-body">
 
-            @if ($errors->has('phenotypeEmaj'))
-            <small class="text text-danger">
-                {{ $errors->first('phenotypeEmaj') }}
-            </small>
-            @endif
-         </div>
-         <br>
-         <div class="form-group {{ $errors->has('phenotypeCmin') ? 'has-error' : '' }} ">
-            <label for="phenotypeCmin" class="form-label text-center">c</label>
-            <select id='phenotypeCmin' name='phenotypeCmin' class="form-select">
-                <option value=''>Choisir +/-</option>
-                <option value="1"  >+</option>
-                <option value="0"  >-</option>
-            </select>
+                        <div class="form-group {{ $errors->has('groupage') ? 'has-error' : '' }} ">
+                            <label for="groupage" class="form-label text-center">Groupage</label>
+                            <select id='groupage' name='groupage' class="form-select">
+                                <option value=''>Choisir le groupage</option>
+                                @foreach ($listeGroupage as $key => $value)
+                                <option value='{!! $value->id !!}'>{!! $value->type !!}</option>
+                                @endforeach
 
-            @if ($errors->has('phenotypeCmin'))
-            <small class="text text-danger">
-                {{ $errors->first('phenotypeCmin') }}
-            </small>
-            @endif
-         </div>
-         <br>
-        <div class="form-group {{ $errors->has('phenotypeEmin') ? 'has-error' : '' }} ">
-            <label for="phenotypeEmin" class="form-label text-center">e</label>
-            <select id='phenotypeEmin' name='phenotypeEmin' class="form-select">
-                <option value=''>Choisir +/-</option>
-                <option value="1"  >+</option>
-                <option value="0"  >-</option>
-            </select>
+                            </select>
+                            @if ($errors->has('groupage'))
+                            <small class="text text-danger">
+                                {{ $errors->first('groupage') }}
+                            </small>
+                            @endif
+                        </div>
+                        <br> <br>
+                        <label class="form-label text-center">Phénotype</label>
 
-            @if ($errors->has('phenotypeEmin'))
-            <small class="text text-danger">
-                {{ $errors->first('phenotypeEmin') }}
-            </small>
-            @endif
-         </div>
-         <br>
-         <div class="form-group {{ $errors->has('phenotypeKell') ? 'has-error' : '' }} ">
-            <label for="phenotypeKell" class="form-label text-center">Kell</label>
-            <select id='phenotypeKell' name='phenotypeKell' class="form-select">
-                <option value=''>Choisir +/-</option>
-                <option value="1"  >+</option>
-                <option value="0"  >-</option>
-            </select>
 
-            @if ($errors->has('phenotypeKell'))
-            <small class="text text-danger">
-                {{ $errors->first('phenotypeKell') }}
-            </small>
-            @endif
-         </div>
+                        <div class="form-group {{ $errors->has('phenotypeCmaj') ? 'has-error' : '' }} ">
+                            <label for="phenotypeCmaj" class="form-label text-center">C</label>
+                            <select id='phenotypeCmaj' name='phenotypeCmaj' class="form-select">
+                                <option value=''>Choisir +/-</option>
+                                <option value="1">+</option>
+                                <option value="0">-</option>
+                            </select>
+
+                            @if ($errors->has('phenotypeCmaj'))
+                            <small class="text text-danger">
+                                {{ $errors->first('phenotypeCmaj') }}
+                            </small>
+                            @endif
+                        </div>
+
+                        <br>
+                        <div class="form-group {{ $errors->has('phenotypeEmaj') ? 'has-error' : '' }} ">
+                            <label for="phenotypeEmaj" class="form-label text-center">E</label>
+                            <select id='phenotypeEmaj' name='phenotypeEmaj' class="form-select">
+                                <option value=''>Choisir +/-</option>
+                                <option value="1">+</option>
+                                <option value="0">-</option>
+                            </select>
+
+                            @if ($errors->has('phenotypeEmaj'))
+                            <small class="text text-danger">
+                                {{ $errors->first('phenotypeEmaj') }}
+                            </small>
+                            @endif
+                        </div>
+                        <br>
+                        <div class="form-group {{ $errors->has('phenotypeCmin') ? 'has-error' : '' }} ">
+                            <label for="phenotypeCmin" class="form-label text-center">c</label>
+                            <select id='phenotypeCmin' name='phenotypeCmin' class="form-select">
+                                <option value=''>Choisir +/-</option>
+                                <option value="1">+</option>
+                                <option value="0">-</option>
+                            </select>
+
+                            @if ($errors->has('phenotypeCmin'))
+                            <small class="text text-danger">
+                                {{ $errors->first('phenotypeCmin') }}
+                            </small>
+                            @endif
+                        </div>
+                        <br>
+                        <div class="form-group {{ $errors->has('phenotypeEmin') ? 'has-error' : '' }} ">
+                            <label for="phenotypeEmin" class="form-label text-center">e</label>
+                            <select id='phenotypeEmin' name='phenotypeEmin' class="form-select">
+                                <option value=''>Choisir +/-</option>
+                                <option value="1">+</option>
+                                <option value="0">-</option>
+                            </select>
+
+                            @if ($errors->has('phenotypeEmin'))
+                            <small class="text text-danger">
+                                {{ $errors->first('phenotypeEmin') }}
+                            </small>
+                            @endif
+                        </div>
+                        <br>
+                        <div class="form-group {{ $errors->has('phenotypeKell') ? 'has-error' : '' }} ">
+                            <label for="phenotypeKell" class="form-label text-center">Kell</label>
+                            <select id='phenotypeKell' name='phenotypeKell' class="form-select">
+                                <option value=''>Choisir +/-</option>
+                                <option value="1">+</option>
+                                <option value="0">-</option>
+                            </select>
+
+                            @if ($errors->has('phenotypeKell'))
+                            <small class="text text-danger">
+                                {{ $errors->first('phenotypeKell') }}
+                            </small>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        Compte Membre
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group ">
+                            <label for="type_personne" class="form-label">Type de personne</label>
+                            <select id="type_personne" name="type_personne" class="form-select">
+                                <option value="user" selected>Utilisateur</option>
+                                <option value="admin">Administrateur</option>
+                                <option value="personnelMedical">Personnel Médical</option>
+                            </select>
+                            @if ($errors->has('type_personne'))
+                            <small class="text text-danger">
+                                {{ $errors->first('type_personne') }}
+                            </small>
+                            @endif
+                        </div> <br>
+                        <!-- Nouveau champ Mot de passe -->
+                        <div class="form-group">
+                            <label for="motDePasse" class="form-label">Mot de passe</label>
+                            <input type="password" id="motDePasse" name="motDePasse"
+                                class="form-control @error('motDePasse') is-invalid @enderror" required>
+
+                            @error('motDePasse')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <br>
+                        <!-- Confirmation du mot de passe -->
+                        <div class="form-group">
+                            <label for="motDePasse_confirmation" class="form-label">Confirmer le mot de passe</label>
+                            <input type="password" id="motDePasse_confirmation" name="motDePasse_confirmation"
+                                class="form-control @error('motDePasse_confirmation') is-invalid @enderror" required>
+
+                            @error('motDePasse_confirmation')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <br>
+                        <div class="form-group col mb-3" id="idCentre-container" style="display: none;">
+                            <label for="idCentre" class="form-label">Centre</label>
+                            <select id="idCentre" name="idCentre"
+                                class="form-select @error('idCentre') is-invalid @enderror">
+                                <option value="">Sélectionner un centre</option>
+                                @foreach ($listeCentres as $centre)
+                                <option value="{{ $centre->id }}">
+                                    {{ $centre->nom }}
+                                </option>
+                                @endforeach
+                            </select>
+                            @error('idCentre')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <!-- Champs dynamiques -->
+                        <div class="form-group" id="pseudo_field" style="display: none;">
+                            <br>
+                            <label for="pseudo" class="form-label">Pseudo</label>
+                            <input type="text" id="pseudo" name="pseudo" class="form-control">
+                        </div>
+
+                        <div class="form-group" id="acces_field" style="display: none;">
+                            <br>
+                            <label for="acces" class="form-label">Accès</label>
+                            <select id="acces" name="acces" class="form-select">
+                                <option value="superviser">Superviser</option>
+                                <option value="autoriser">Autoriser</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="accesadmin_field" style="display: none;">
+                            <br>
+                            <label for="accesadmin" class="form-label">Accès admin</label>
+                            <select id="accesadmin" name="accesadmin" class="form-select">
+                                <option value="admin">Admin</option>
+                                <option value="sousadmin">Sous-admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="fonction_field" style="display: none;">
+                            <br>
+                            <label for="fonction" class="form-label">Fonction</label>
+                            <select id="fonction" name="fonction" class="form-select">
+                                <option value="medecin">Médecin</option>
+                                <option value="infirmier">Infirmier</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+
             </div>
-          </div>
-  
-         <div class="card">
-            <div class="card-header">
-                 Compte Membre
-            </div>
-            <div class="card-body">
-            <div class="form-group ">
-                  <label for="type_personne" class="form-label">Type de personne</label>
-                  <select id="type_personne" name="type_personne" class="form-select">
-                      <option value="user" selected>Utilisateur</option>
-                      <option value="admin">Administrateur</option>
-                      <option value="personnelMedical">Personnel Médical</option>
-                  </select>
-                  @if ($errors->has('type_personne'))
-                      <small class="text text-danger">
-                          {{ $errors->first('type_personne') }}
-                      </small>
-                  @endif
-              </div>  <br>
-              <!-- Nouveau champ Mot de passe -->
-<div class="form-group">
-    <label for="motDePasse" class="form-label">Mot de passe</label>
-    <input type="password" id="motDePasse" name="motDePasse" class="form-control @error('motDePasse') is-invalid @enderror" required>
-    
-    @error('motDePasse')
-        <div class="text-danger">{{ $message }}</div>
-    @enderror
-</div>
-<br>
-<!-- Confirmation du mot de passe -->
-<div class="form-group">
-    <label for="motDePasse_confirmation" class="form-label">Confirmer le mot de passe</label>
-    <input type="password" id="motDePasse_confirmation" name="motDePasse_confirmation" class="form-control @error('motDePasse_confirmation') is-invalid @enderror" required>
-    
-    @error('motDePasse_confirmation')
-        <div class="text-danger">{{ $message }}</div>
-    @enderror
-</div>
-              <br>
-              <div class="form-group col mb-3" id="idCentre-container" style="display: none;">
-    <label for="idCentre" class="form-label">Centre</label>
-    <select id="idCentre" name="idCentre" class="form-select @error('idCentre') is-invalid @enderror">
-        <option value="">Sélectionner un centre</option>
-        @foreach ($listeCentres as $centre)
-            <option value="{{ $centre->id }}">
-                {{ $centre->nom }}
-            </option>
-        @endforeach
-    </select>
-    @error('idCentre')
-        <div class="text-danger">{{ $message }}</div>
-    @enderror
-</div>
-        <!-- Champs dynamiques -->
-        <div class="form-group" id="pseudo_field" style="display: none;">
-        <br>
-            <label for="pseudo" class="form-label">Pseudo</label>
-            <input type="text" id="pseudo" name="pseudo" class="form-control"  >
-        </div>
-
-        <div class="form-group" id="acces_field" style="display: none;">
-    <br>
-    <label for="acces" class="form-label">Accès</label>
-    <select id="acces" name="acces" class="form-select">
-        <option value="superviser">Superviser</option>
-        <option value="autoriser">Autoriser</option>
-    </select>
-</div>
-     
-        <div class="form-group" id="accesadmin_field" style="display: none;">
-            <br>
-            <label for="accesadmin" class="form-label">Accès admin</label>
-            <select id="accesadmin" name="accesadmin" class="form-select">
-                <option value="admin">Admin</option>
-                <option value="sousadmin">Sous-admin</option>
-            </select>
-        </div>
-        <div class="form-group" id="fonction_field" style="display: none;">
-    <br>
-    <label for="fonction" class="form-label">Fonction</label>
-    <select id="fonction" name="fonction" class="form-select">
-        <option value="medecin">Médecin</option>
-        <option value="infirmier">Infirmier</option>
-    </select>
-</div>
-
-            </div>
-          </div>
-
-      
-</div>
 
 
-       
-    
-        
-      </form>
-   </div>
- <!-- AJAX pour récupérer les communes dynamiquement -->
+
+
+
+    </form>
+</div>
+<!-- AJAX pour récupérer les communes dynamiquement -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
     $('#wilayaDomicile').change(function() {
         var wilaya_id = $(this).val();
        // Convertir le code wilaya en format 01, 02, etc.
@@ -452,10 +459,10 @@ $(document).ready(function() {
             $('#communeProfessionnelle').html('<option value="">Sélectionner une wilaya d\'abord</option>');
         }
     });
- 
+
         function updateFields() {
             var typePersonne = $('#type_personne').val();
-            
+
             // Masquer tous les champs d'abord
             $('#pseudo_field, #acces_field, #fonction_field, #accesadmin_field').hide();
 
@@ -463,12 +470,12 @@ $(document).ready(function() {
             if (typePersonne === 'user') {
                 $('#pseudo_field').show();
             } else if (typePersonne === 'admin') {
-              
+
                 $('#accesadmin_field').show();
             } else if (typePersonne === 'personnelMedical') {
                 $('#fonction_field').show();
                 $('#acces_field').show();
-              
+
             }
         }
 
@@ -501,9 +508,9 @@ $(document).ready(function() {
     // Event listener for changes in type_personne dropdown
     typePersonneSelect.addEventListener('change', function () {
         if (this.value === 'user') {
-            idCentreContainer.style.display = 'none';  
+            idCentreContainer.style.display = 'none';
         } else {
-            idCentreContainer.style.display = 'block';   
+            idCentreContainer.style.display = 'block';
         }
     });
 
@@ -513,4 +520,3 @@ $(document).ready(function() {
     }
 </script>
 @endsection
- 

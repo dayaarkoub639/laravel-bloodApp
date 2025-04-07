@@ -7,6 +7,6 @@ use Illuminate\Http\Request;
 class StatistiqueController extends Controller
 {
     public function statistique(){
-        return view('statistique');
+        return view('stats.statistiques');
     }
 }

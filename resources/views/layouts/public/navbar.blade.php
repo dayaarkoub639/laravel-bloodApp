@@ -70,23 +70,23 @@
                     <span class="hide-menu">ADMINISTRATION</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link {{ request()->is('statistiques*') ? 'active' : '' }}" href="./icon-tabler.html" aria-expanded="false">
+                    <a class="sidebar-link {{ request()->is('statistiques*') ? 'active' : '' }}" href="{{ route('statistiques') }}"  aria-expanded="false">
                         <span><i class="ti ti-chart-arrows"></i></span>
                         <span class="hide-menu">Statistiques</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link {{ request()->is('historique*') ? 'active' : '' }}"  href="{{ route('historique') }}"aria-expanded="false">
+                    <a class="sidebar-link {{ request()->is('historique*') ? 'active' : '' }}"  href="{{ route('historique') }}" aria-expanded="false">
                         <span><i class="ti ti-timeline"></i></span>
                         <span class="hide-menu">Historique</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
+               <!-- <li class="sidebar-item">
                     <a class="sidebar-link {{ request()->is('parametres*') ? 'active' : '' }}" href="./sample-page.html" aria-expanded="false">
                         <span><i class="ti ti-settings"></i></span>
                         <span class="hide-menu">Paramètres</span>
                     </a>
-                </li>
+                </li>-->
             </ul>
         </nav>
         <!-- End Sidebar navigation -->

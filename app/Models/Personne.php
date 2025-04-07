@@ -35,15 +35,15 @@ class Personne extends  Authenticatable
         'longitude',
         'lieuNaissance',
         'epouseDe',
-        
+
         'idGroupage',
         'wilaya_prof_id'  ,
         'commune_prof_id'  ,
         'wilaya_domicile_id' ,
         'commune_domicile_id' ,
-        'adresse',  
-        'adressePro',  
-        'observations',  
+        'adresse',
+        'adressePro',
+        'observations',
         'cMaj',
         'cMin',
         'eMaj',
@@ -55,12 +55,12 @@ class Personne extends  Authenticatable
     protected $hidden = [
         'motDePasse', // Cache le mot de passe
     ];
-  
+
     public function getIdUserAttribute($value)
     {
         return str_pad($value, 8, '0', STR_PAD_LEFT); // Ajoute des zéros devant si nécessaire
     }
- 
+
       public function personneMedical()
     {
         return $this->hasOne(PersonneMedical::class, 'idPersonne', 'idUser');
@@ -75,7 +75,7 @@ class Personne extends  Authenticatable
     {
         return $this->belongsTo(Groupage::class, 'idGroupage', 'id');
     }
- 
+
     public function communeDomicile()
     {
         return $this->belongsTo(Commune::class, 'commune_domicile_id', 'id');

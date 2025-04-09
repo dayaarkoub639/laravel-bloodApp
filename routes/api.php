@@ -13,8 +13,11 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
  */
+Route::post('/accepteDemande', [BloodRequestController::class, 'accepterDemande']);
+Route::post('/find-donors', [BloodRequestController::class, 'findNearbyDonors']); 
+Route::post('/update-location', [BloodRequestController::class, 'updateLocation']);
+Route::post('/updatePhone', [BloodRequestController::class, 'updatePhone']);
 
- Route::post('/find-donors', [BloodRequestController::class, 'findNearbyDonors']);
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('register',  [RegisterController::class, 'register']);

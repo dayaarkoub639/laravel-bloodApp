@@ -40,6 +40,7 @@ class Demande extends Model
       public function personnes()
         {
             return $this->belongsToMany(Personne::class, 'demande_personne', 'demande_id', 'personne_id')
-                        ->withTimestamps(); // si tu as les timestamps dans la table pivot
+            ->withPivot('date_acceptation')
+            ->withTimestamps();
         }
 }

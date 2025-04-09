@@ -34,7 +34,7 @@ class UrgencesController extends Controller
        $dateLimite = Carbon::now()->subMonths(3);
            
             // Requête pour trouver les utilisateurs donneurs compatibles
-            $donneurs = Personne:: where('idGroupage', $request->idGroupage)
+            $donneurs = Personne::where('idGroupage', $request->idGroupage)
             
                 ->whereHas('dons', function ($query) use ($dateLimite) {
                     $query->where('serologie', 0);

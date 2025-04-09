@@ -14,7 +14,7 @@ use App\Http\Controllers\HistoriqueController;
 
 use App\Http\Controllers\DonController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-
+use App\Http\Controllers\GoogleMapController;
 
 Route::get('/', function () {
     return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
@@ -23,7 +23,10 @@ Route::get('/', function () {
 
 // Routes protégées par auth et vérification email
 Route::middleware(['auth', 'verified'])->group(function () {
+    
 
+    Route::get('/resolve-google-map-url', [GoogleMapController::class, 'resolveUrl']);
+    
     // Définir une route qui pointe vers MainController@index
     Route::get('/dashboard', [MainController::class, 'index'])->name('dashboard');
     Route::post('/dashboard', [MainController::class, 'index']);

@@ -55,7 +55,7 @@ class DemandeController extends Controller
             'idDemandeur' => $request->idDemandeur,
             'numeroDossierMedical' => $request->numeroDossierMedical,
             'notes' => $request->notes,
-            'typeDemande' => "rendez vous",
+            'typeDemande' => "urgent",
         ]);
 
         return redirect()->route('demandes.liste')->with('success', 'Demande ajoutée avec succès.');

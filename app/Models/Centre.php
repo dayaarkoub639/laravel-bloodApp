@@ -17,8 +17,9 @@ class Centre extends Model
         'nom',
         'address',
         'wilaya',
-        'commune',
-        'localisation',
+        'commune', 
+        'longitude',
+        'latitude',
         'numeroTlp1',
         'numeroTlp2',
         'imageUrl'

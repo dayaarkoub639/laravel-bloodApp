@@ -5,7 +5,7 @@
  
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <style>
-        #map { height: 600px; width: 100%; }
+        #map { height: 600px; width: 100%;z-index: 0; }
     </style>
     <div class="dashboard_content bg-light-4 container-fluid">
         

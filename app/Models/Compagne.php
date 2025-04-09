@@ -22,6 +22,8 @@ class Compagne extends Model
         'heureFin',
         'dateDebut',
         'dateFin',
+        'longitude',
+        'latitude',
     ];
 
 

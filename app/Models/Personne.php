@@ -92,6 +92,7 @@ class Personne extends  Authenticatable
     public function demandes()
     {
         return $this->belongsToMany(Demande::class, 'demande_personne', 'personne_id', 'demande_id')
-                    ->withTimestamps();
+        ->withPivot('date_acceptation')
+        ->withTimestamps();
     }
 }

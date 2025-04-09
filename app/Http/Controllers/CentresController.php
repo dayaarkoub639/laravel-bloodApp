@@ -35,7 +35,7 @@ class CentresController extends Controller
             'address'     => 'required|string|max:255',
             'wilaya'      => 'required|integer|exists:wilayas,id',
             'commune'     => 'required|integer|exists:communes,id',
-            'localisation'=> 'nullable|string',
+            
             'numeroTlp1'  => 'required|string|max:15|regex:/^[0-9]+$/',
             'numeroTlp2'  => 'nullable|string|max:15|regex:/^[0-9]+$/',
         ]);
@@ -69,11 +69,11 @@ class CentresController extends Controller
            // Validation des données
            $validator = Validator::make($request->all(), [
             'nom'         => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048', 
+            'image' => 'image|mimes:jpg,jpeg,png,gif|max:2048', 
             'address'     => 'required|string|max:255',
             'wilaya'      => 'required|integer|exists:wilayas,id',
             'commune'     => 'required|integer|exists:communes,id',
-            'localisation'=> 'nullable|string',
+          
             'numeroTlp1'  => 'required|string|max:15|regex:/^[0-9]+$/',
             'numeroTlp2'  => 'nullable|string|max:15|regex:/^[0-9]+$/',
         ]);
@@ -83,18 +83,18 @@ class CentresController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $centre = Centre::findOrFail($id);
-          // Vérifier si une nouvelle image a été téléchargée
-    // Vérifier si une nouvelle image a été téléchargée
-    if ($request->hasFile('image')) {
-        // Supprimer l'ancienne image si elle existe
-        if ($centre->imageUrl) {
-            Storage::delete('public/' . $centre->imageUrl);
-        }
+          
+        // Vérifier si une nouvelle image a été téléchargée
+        if ($request->hasFile('image')) {
+            // Supprimer l'ancienne image si elle existe
+            if ($centre->imageUrl) {
+                Storage::delete('public/' . $centre->imageUrl);
+            }
 
-        // Stocker la nouvelle image
-        $imagePath = $request->file('image')->store('images', 'public');
-        $centre->imageUrl = $imagePath;
-    }
+            // Stocker la nouvelle image
+            $imagePath = $request->file('image')->store('images', 'public');
+            $centre->imageUrl = $imagePath;
+        }
 
   
    
@@ -104,7 +104,8 @@ class CentresController extends Controller
     'address'     => $request->address,
     'wilaya'      => $request->wilaya,
     'commune'     => $request->commune,
-    'localisation'=> $request->localisation,
+    'longitude'=> $request->longitude,
+    'latitude'=> $request->latitude,
     'numeroTlp1'  => $request->numeroTlp1,
     'numeroTlp2'  => $request->numeroTlp2,
 ]);

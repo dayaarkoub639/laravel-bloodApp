@@ -23,13 +23,18 @@ class RegisterController extends Controller
 
         $part3 = str_pad(self::getNextSequence() , 5, '0', STR_PAD_LEFT); // Numéro séquentiel sur 5 digits
         $part2 = str_pad($wilaya_domicile_id, 2, '0', STR_PAD_LEFT); // De 01 à 58
+
+
         return "{$gender}{$part2}{$part3}";
     }
 
     public static function getNextSequence()
     {
-        $lastRecord = Personne::orderBy('idUser', 'desc')->first();
-
+       
+       // $lastRecord = Personne::orderBy('idUser', 'desc')->noCache()->first();
+        // Si vous avez un champ timestamp
+$lastRecord = Personne::latest('created_at')->first();
+        $lastRecord= $lastRecord->fresh();
         if (!$lastRecord) {
             return 1;
         }
@@ -88,7 +93,7 @@ class RegisterController extends Controller
 
             ]);
             $idCustom = self::generateCustomId($validated['wilaya_domicile_id'], $validated['gender']) ;
-            // dd($idCustom);
+          
             // Commencer une transaction
             \DB::beginTransaction();
 

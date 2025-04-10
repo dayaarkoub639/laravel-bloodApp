@@ -9,6 +9,7 @@ use App\Events\BloodRequestEvent;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use App\Events\NewNotificationUserEvent;
 
 class BloodRequestController extends Controller
 {
@@ -58,7 +59,7 @@ class BloodRequestController extends Controller
         // Diffuser l'événement
         event(new BloodRequestEvent($eventData));
             // Si tu veux retourner avec distance triée, décommente et adapte ci-dessous :
-        
+        $donneurs = $donneurs->sortBy('distance')->values();
         foreach ($donneurs as $donneur) {
             $donneur->distance = $this->calculerDistance($latitude, $longitude, $donneur->latitude, $donneur->longitude);
             $donneur->pseudo = $donneur->user()->value("pseudo")?? "";
@@ -88,7 +89,7 @@ class BloodRequestController extends Controller
             }
         }
 
-        $donneurs = $donneurs->sortBy('distance')->values();
+     
         
 
         return response()->json([
@@ -173,6 +174,7 @@ class BloodRequestController extends Controller
         ]);
 
         if ($validator->fails()) {
+
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
@@ -188,10 +190,22 @@ class BloodRequestController extends Controller
             $personne->demandes()->syncWithoutDetaching([
                 $demande_id => ['date_acceptation' => now()]
             ]);
+
+            // Créer la notification dans la base de données
+            $notification = [
+                'title' => 'Demande acceptée',
+                'body' => 'qq un a accpeter une demande  de sang',
+                'data' => ['idDemandeur' => $demande_id,
+                'idCentreProche' => "todo",
+                'idPersonne' => $request->idUser] // données supplémentaires
+            ];
+
+            // Déclencher l'événement
+            event(new NewNotificationUserEvent($request->idUser, $notification));
             return response()->json([
                 'success' => true,
                 'message' => 'Demande accepté',
-                'centreProche' => "",
+                'centreProche' => "todo",
                 'demande_id' => $demande_id,
             ]);
         } catch (\Exception $e) {

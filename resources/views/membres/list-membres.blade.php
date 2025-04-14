@@ -250,16 +250,16 @@
 
                                     <h6 class="fw-normal">
 
-                                        @if($personne->commune)
-                                        {{ $personne->commune->wilaya_name }}
+                                        @if($personne->communeDomicile)
+                                        {{ $personne->communeDomicile->wilaya_name }}
                                         @else
                                         Aucune wilaya associée
                                         @endif
                                     </h6>
 
                                     <span class="fw-normal small">
-                                        @if($personne->commune)
-                                        {{ $personne->commune->commune_name }}
+                                        @if($personne->communeDomicile)
+                                        {{ $personne->communeDomicile->commune_name }}
                                         @else
                                         Aucune commune associée
                                         @endif
@@ -329,6 +329,8 @@
 <!-- AJAX pour récupérer les communes dynamiquement -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+ 
+
     $('#wilaya').change(function() {
         var wilaya_id = $(this).val();
        // Convertir le code wilaya en format 01, 02, etc.

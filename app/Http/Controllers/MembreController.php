@@ -36,8 +36,12 @@ class MembreController extends Controller
 
     public function searchAdvanced(Request $request)
     {
-        $query = Personne::query();
-
+           
+        $dateLimite = Carbon::now()->subMonths(3);
+        $query = Personne::query()
+        ->whereHas('dons', function ($query) use ($dateLimite) {
+            $query->where('serologie', 0);
+        });
         // Recherche générale
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -85,9 +89,32 @@ class MembreController extends Controller
             $query->where('commune_domicile_id', $request->input('commune'));
         }
 
-        // Résultats paginés
+      
         $users = $query->get();
+        foreach ($users as $donneur) {
+            $donneur->dons = $donneur->dons()->get() ?? "";
+              // Vérifier si le donneur a des dons
+            if ($donneur->dons->isNotEmpty()) {
+                // Trier les dons par date décroissante et prendre le premier (le plus récent)
+                $latestDon = $donneur->dons->sortByDesc('date')->first();
+                
+                // Convertir la date du dernier don en instance de Carbon
+                $latestDate = Carbon::parse($latestDon->date);
+                
+                // Date actuelle
+                $currentDate = Carbon::now();
+                
+                // Calculer la différence entre la date actuelle et la date du dernier don
+                $diffInMonths = $latestDate->diffInMonths($currentDate);
 
+                // Vérifier si le dernier don est dans les 3 derniers mois
+                if ($diffInMonths > 3) {
+                    // Ajouter le donneur à la liste des donneurs filtrés
+                    $donneursFiltres[] = $donneur;
+                }
+            }
+        }
+        $users = $donneursFiltres??[];
         $listeGroupage = Groupage::all();
         $listeWilayas = Wilaya::all();
         $listeCommune = Commune::all();

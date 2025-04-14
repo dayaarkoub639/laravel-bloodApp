@@ -8,7 +8,7 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
-
+use Illuminate\Broadcasting\PrivateChannel;
 
 class BloodRequestEvent implements ShouldBroadcast
 {
@@ -23,7 +23,9 @@ class BloodRequestEvent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new Channel('blood-requests');// Canal public
+        //return new Channel('blood-requests');// Canal public
+        // Utilisation d'un canal privé basé sur l'ID de l'utilisateur
+        return new PrivateChannel('user.' . $this->data['user_id']);
     }
 
     public function broadcastAs()
@@ -31,3 +33,4 @@ class BloodRequestEvent implements ShouldBroadcast
         return 'new-blood-request';// Nom de l'événement
     }
 }
+

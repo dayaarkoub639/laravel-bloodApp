@@ -13,8 +13,8 @@
 
         <div class="form-group col mb-3">
                 <label for="idCentre" class="form-label">Centre</label>
-                <select id="idCentre" name="id" class="form-select @error('idCentre') is-invalid @enderror">
-                    <option value="">Sélectionner une centre</option>
+                <select id="idCentre" name="idCentre" class="form-select @error('idCentre') is-invalid @enderror">
+                    <option v<alue="">Sélectionner une centre</option>
                     @foreach ($listeCentres as $centre)
                         <option value="{{ $centre->id }}">
                             {{ $centre->nom }}  
@@ -82,8 +82,25 @@
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
+        <div class="mb-3">
+    <label for="link" class="form-label">Lien de Google Maps</label>
+    <input type="text" class="form-control" id="link" value="https://maps.app.goo.gl/kgk7BY3e2g5goBbY6" required>
+</div>
 
-     
+<div class="mb-3">
+    <label for="latitude" class="form-label">Latitude</label>
+    <input type="text" class="form-control" id="latitude"  name="latitude" readonly>
+</div>
+
+<div class="mb-3">
+    <label for="longitude" class="form-label">Longitude</label>
+    <input type="text" class="form-control" id="longitude" name="longitude" readonly>
+</div>
+
+<!-- Button pour récupérer les coordonnées -->
+<button type="button" class="btn btn-outline-primary" id="getCoordinatesBtn">Obtenir les coordonnées</button>
+
+<br><br>
 
         <div class="row mb-3">
         <div class="col">
@@ -151,5 +168,30 @@ $(document).ready(function() {
         }
     });
 });
+
+ 
+
+  // Écouter le clic du bouton
+  document.getElementById('getCoordinatesBtn').addEventListener('click', function() {
+            var link = document.getElementById('link').value;
+
+            // Faire une requête AJAX vers Laravel pour obtenir les coordonnées
+            fetch('/resolve-google-map-url?url=' + encodeURIComponent(link))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.latitude && data.longitude) {
+                        // Mettre à jour les champs Latitude et Longitude
+                        document.getElementById('latitude').value = data.latitude;
+                        document.getElementById('longitude').value = data.longitude;
+                    } else {
+                        alert("Aucune coordonnée trouvée.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erreur:", error);
+                    alert("Une erreur est survenue.");
+                });
+        });
+
 </script>
 @endsection

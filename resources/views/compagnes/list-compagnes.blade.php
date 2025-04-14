@@ -109,12 +109,12 @@
                   </td>
                      
                       <td class="border-bottom-0">
-                          <h6 class="fw-normal">{!! $compagne->dateDebut !!}</h6>
+                          <h6 class="fw-normal">{!! $compagne->dateDebut !!} {!! $compagne->heureDebut !!}</h6>
                       
                                                   
                       </td>
                       <td class="border-bottom-0">
-                          <h6 class="fw-normal">{!! $compagne->dateFin !!}</h6>                 
+                          <h6 class="fw-normal">{!! $compagne->dateFin !!} {!! $compagne->heureFin !!}</h6>                 
                       </td> 
                       <td class="border-bottom-0"> 
                           <a href="{{ url('compagnes/modifier/'.$compagne->id) }}"  class="btn btn-sm">

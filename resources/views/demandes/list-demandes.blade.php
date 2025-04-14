@@ -167,6 +167,7 @@
                 <tr>
                     <td class="border-bottom-0">
                       <h6 class="fw-semibold mb-0">{{ $demande->id  }}</h6>
+                      <p class="small"> {{ $demande->typeDemande}}</p>
                     </td>
                     <td class="border-bottom-0">
                       <h6 class="fw-normal">
@@ -187,14 +188,7 @@
                                                   
                       </td>
                       <td class="border-bottom-0">  
-                        <?php
-                            $statusClasses = [
-                                'Réfusé' => 'bg-danger',
-                                'En attente' => 'bg-warning',
-                                'En cours' => 'bg-secondary',
-                                'Complété' => 'bg-success',
-                            ];
-                      ?>
+                     
 
                       <span class="  fw-semibold">
                       ({{count($demande->personnes)}})  Accepté

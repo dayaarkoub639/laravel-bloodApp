@@ -31,16 +31,15 @@ class CompagnesController extends Controller
     {
        
         $request->validate([
-            'id' => 'required',
+            'idCentre' => 'required',
             'address' => 'required|string|max:255',
             'wilaya' => 'required|integer',
             'commune' => 'required|integer',
             'etablissement' => 'required|string|max:255',
-          
             'dateDebut' => 'required|date',
             'dateFin' => 'required|date|after_or_equal:dateDebut',
             'heureDebut' => 'required',
-        'heureFin' => 'required|after:heureDebut',
+            'heureFin' => 'required|after:heureDebut',
         ]);
 
         Compagne::create($request->all());
@@ -66,7 +65,6 @@ class CompagnesController extends Controller
             'wilaya' => 'required|integer',
             'commune' => 'required|integer',
             'etablissement' => 'required|string|max:255',
-         
             'dateDebut' => 'required|date',
             'dateFin' => 'required|date|after_or_equal:dateDebut',
             'heureDebut' => 'required',

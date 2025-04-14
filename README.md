@@ -19,11 +19,16 @@
 - php artisan db:seed 
 - php artisan storage:link 
 
- 
+
+### Pour faire fonctionner le pusher (boostsrap.js)
+ - npm install
+ - npm run build
+
 ### Lancer le serveur 
 - php artisan serve
+php artisan queue:work   
 
-### Effacer le cach
+### Effacer le cache
 - php artisan config:clear
 - php artisan optimize:clear
 

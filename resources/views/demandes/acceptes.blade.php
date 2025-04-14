@@ -28,7 +28,7 @@
  
    <div class="container py-4">
     <h4 class="mb-4 text-danger d-flex align-items-center">
-        <i class="bi bi-droplet me-2"></i> Demandes acceptées ({{count($donneurs->personnes)}})
+        <i class="bi bi-droplet me-2"></i> Demandes acceptées ({{count($donneurs->personnes)}}) 
     </h4>
 
 
@@ -77,6 +77,8 @@
     @endif  
 </p>  
                 </small>
+                <p> <a href="{{ url('membres/fiche/'.$donneur->user->keyIdUser) }}"> Voir la fiche #{{ $donneur->user->keyIdUser }}</a></p>
+
             </div>
 
             <!-- Groupe sanguin -->

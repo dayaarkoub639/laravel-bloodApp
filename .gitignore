@@ -1,4 +1,5 @@
 /.phpunit.cache
+/database
 /node_modules
 /public/build
 /public/hot
@@ -20,3 +21,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+.gitignore
+.gitignore

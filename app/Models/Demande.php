@@ -21,7 +21,7 @@ class Demande extends Model
         'serviceMedical',
         'groupageDemande',
         'quantiteDemande',
-        
+        "typeDemande",
         'typeMaladie',
         'idDemandeur',
         'numeroDossierMedical',

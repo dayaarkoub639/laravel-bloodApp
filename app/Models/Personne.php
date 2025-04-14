@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use App\Models\User;
 use App\Models\Personne;
 use App\Models\Commune;
@@ -14,7 +15,7 @@ use App\Models\Demande;
 
 class Personne extends  Authenticatable
 {
-    use HasApiTokens, HasFactory;
+    use HasApiTokens, HasFactory,Notifiable;
     protected $table = 'personnes'; // Nom de la table
     protected $primaryKey = 'idUser'; // Clé primaire
     public $timestamps = true; // Active les colonnes created_at et updated_at

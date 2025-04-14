@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use App\Events\NewNotificationUserEvent;
+use Illuminate\Support\Facades\DB;
 
 class BloodRequestController extends Controller
 {
@@ -38,34 +39,43 @@ class BloodRequestController extends Controller
                 sin( radians( latitude ) ) ) ) AS distance",
                 [$latitude, $longitude, $latitude]
             )
-            ->having('distance', '<', 20) // 20 km de rayon
+            ->having('distance', '<', 100) // 100 km de rayon
             
             ->get();
             
             
                 // Si aucun donneur trouvé
-        if ($donneurs->isEmpty()) {
+        if ($donneurs->isEmpty()) { 
             return response()->json(['message' => 'Aucun donneur trouvé à proximité'], 404);
         }
-        // Préparer les données pour l'événement
-        $eventData = [
-            'groupage' => $request->groupage,
-            'position' => "{$latitude},{$longitude}",
-            'message' => "Besoin urgent de sang du groupe id {$request->groupage} !",
-            'donneurs' => $donneurs
-        ];
-
-    
-        // Diffuser l'événement
-        event(new BloodRequestEvent($eventData));
+      
             // Si tu veux retourner avec distance triée, décommente et adapte ci-dessous :
         $donneurs = $donneurs->sortBy('distance')->values();
+        $donneurs = $donneurs->take(3);
+       
         foreach ($donneurs as $donneur) {
+           
             $donneur->distance = $this->calculerDistance($latitude, $longitude, $donneur->latitude, $donneur->longitude);
             $donneur->pseudo = $donneur->user()->value("pseudo")?? "";
-
+         
+            
+            $donneur->centreProche = $this->getCentreProche($donneur->latitude, $donneur->longitude);
                 // done récupérer la date la plus récente, puis comparer cette date avec la date actuelle. 
             
+               // Préparer les données pour l'événement
+                $eventData = [
+                    'groupage' => $request->groupage,
+                    'position' => "{$donneur->latitude},{$donneur->longitude}",
+                    'message' => "Besoin urgent de sang du groupe id {$request->groupage} !",
+                    'user_id' =>  $donneur->id, 
+                    'demandeurId' =>  $request->idDemandeur, 
+                    'centreProche' =>  $donneur->centreProche, 
+                
+                ];
+
+    
+                 // Diffuser l'événement
+               event(new BloodRequestEvent($eventData));
                 $donneur->dons = $donneur->dons()->get() ?? "";
                 // Vérifier si le donneur a des dons
             if ($donneur->dons->isNotEmpty()) {
@@ -116,7 +126,34 @@ class BloodRequestController extends Controller
     }
 
 
-
+  
+    
+    private function getCentreProche($lat, $long)
+    {
+        // Utilise la formule de Haversine pour calculer la distance en kilomètres
+        $centre = DB::table('centres')
+            ->select('nom', 'id',
+                DB::raw("(
+                    100 * acos(
+                        cos(radians(?)) *
+                        cos(radians(latitude)) *
+                        cos(radians(longitude) - radians(?)) +
+                        sin(radians(?)) *
+                        sin(radians(latitude))
+                    )
+                ) AS distance"))
+            ->orderBy('distance')
+            ->limit(1)
+            ->setBindings([$lat, $long, $lat])
+            ->first();
+    
+        if ($centre) {
+            return $centre->nom . " (id : " . $centre->id . ")";
+        }
+    
+        return "Centre inconnu";
+    }
+    
     public function updateLocation(Request $request)
     {
         // Validation des données
@@ -196,16 +233,17 @@ class BloodRequestController extends Controller
                 'title' => 'Demande acceptée',
                 'body' => 'qq un a accpeter une demande  de sang',
                 'data' => ['idDemandeur' => $demande_id,
-                'idCentreProche' => "todo",
+                'idCentreProche' => $this->getCentreProche($personne->latitude, $personne->longitude),
                 'idPersonne' => $request->idUser] // données supplémentaires
             ];
 
             // Déclencher l'événement
-            event(new NewNotificationUserEvent($request->idUser, $notification));
+            event(new NewNotificationUserEvent($request->idUser,
+             $notification));
             return response()->json([
                 'success' => true,
                 'message' => 'Demande accepté',
-                'centreProche' => "todo",
+                'centreProche' =>$this->getCentreProche($personne->latitude, $personne->longitude),
                 'demande_id' => $demande_id,
             ]);
         } catch (\Exception $e) {
@@ -249,45 +287,3 @@ class BloodRequestController extends Controller
        }
    }
 }
-
-       /* [$latitude, $longitude] = explode(',', $request->currentUserPosition);
-
-        $donors = Personne::where('idGroupage', $request->groupage)
-            ->whereNotNull('latitude')
-            ->whereNotNull('longitude')
-            ->selectRaw(
-                "*, ( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * 
-                cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * 
-                sin( radians( latitude ) ) ) ) AS distance",
-                [$latitude, $longitude, $latitude]
-            )
-            ->having('distance', '<', 20) // 10 km de rayon
-            ->orderBy('distance')
-            ->get();
-
-       // Si aucun donneur trouvé
-       if ($donors->isEmpty()) {
-        return response()->json(['message' => 'Aucun donneur trouvé à proximité'], 404);
-    }
-
-    // Préparer les données pour l'événement
-    $eventData = [
-        'groupage' => $request->groupage,
-        'position' => "{$latitude},{$longitude}",
-        'message' => "Besoin urgent de sang du groupe id {$request->groupage} !",
-        'donors' => $donors
-    ];
-
-    // Diffuser l'événement en temps réel
-    //broadcast(new BloodRequestEvent($eventData))->toOthers();
- // Diffuser l'événement
- event(new BloodRequestEvent($eventData));
-
-    // Retourner la liste des donneurs
-    return response()->json([
-        'message' => 'Demande envoyée avec succès',
-        'donors' => $donors
-    ]);
-    }
-}
-*/

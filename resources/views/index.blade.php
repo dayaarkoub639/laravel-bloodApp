@@ -9,6 +9,12 @@
     Try publishing an event to channel <code>my-channel</code>
     with event name <code>my-event</code>.
   </p>
+  <a href="/" class="position-relative">
+    🔔 Notifications
+    <span id="notif-count" class="badge badge-danger" style="display: none; position:absolute; top:0; right:0;">
+        0
+    </span>
+</a>
 </div>
   <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <script>
@@ -23,6 +29,15 @@
     var channel = pusher.subscribe('blood-requests');
     channel.bind('new-blood-request', function(data) {
       alert(JSON.stringify(data));
+      updateNotificationBadge();
     });
+
+    function updateNotificationBadge() {
+        let badge = document.getElementById('notif-count');
+        if (badge) {
+            badge.innerText = parseInt(badge.innerText || 0) + 1;
+            badge.style.display = 'inline-block';
+        }
+      }
   </script>
 @endsection

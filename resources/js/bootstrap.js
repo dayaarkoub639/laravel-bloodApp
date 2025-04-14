@@ -17,7 +17,10 @@ window.Echo = new Echo({
 
 // Écouter l'événement  
  
+ //Si le canal est public //pour tous les admins peut ecouter
 var channel = Echo.channel('blood-requests');
 channel.listen('.new-blood-request', function(data) {
+    alert('Nouvelle demande de sang : ' + data.message);
     alert(JSON.stringify(data));
-});
+    
+}); 

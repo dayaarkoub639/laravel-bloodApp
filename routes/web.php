@@ -91,6 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/urgences', [UrgencesController::class, 'index'])->name('urgences');
     Route::get('/historique', [HistoriqueController::class, 'index'])->name('historique');
     Route::get('/urgences/search', [UrgencesController::class, 'searchByGroupage'])->name('dons.search');
+    Route::post('/envoyer-demandes', [UrgencesController::class, 'envoyerDemandes'])->name('urgences.envoyerDemandes');
 
     // Statistiques
     Route::get('/statistiques', [StatistiqueController::class, 'statistique'])->name('statistiques');

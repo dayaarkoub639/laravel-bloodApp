@@ -8,16 +8,15 @@ use App\Models\Personne;
 use App\Models\Don;
 use App\Models\Demande;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class UrgencesController extends Controller
 {
    public function index(){
     $listeGroupage= Groupage::all(); 
-    $donneurs = Personne:: whereHas('dons')
-    ->with(['groupage', 'dons' => function ($query) {
-        $query->orderBy('date', 'desc');
-    }])
-    ->get();
+    $donneurs = [];
     $totalDons = count($donneurs);
     $totalDemandes = Demande::count();
     return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes"));
@@ -26,6 +25,7 @@ class UrgencesController extends Controller
    {
        $request->validate([
            'idGroupage' => 'required|integer|exists:groupage,id',
+           'nbreDonneursDemande' => 'required',
        ]);
        $listeGroupage= Groupage::all(); 
        $totalDons = Don::count();
@@ -48,10 +48,19 @@ class UrgencesController extends Controller
             }
         
      
-        
+            $donneurs = $donneurs->take($request->nbreDonneursDemande);
             foreach ($donneurs as $donneur) {
                 //TODO la distance et le temps
-
+                $centreInfos = $this->getCentreProche($donneur->latitude, $donneur->longitude);
+ 
+                if ($centreInfos) {
+                    $donneur->centreProche = $centreInfos['nom'];
+                    $donneur->distanceKm = $centreInfos['distance_km'];
+                    $donneur->tempsEstime = $centreInfos['temps_min'];
+                }
+                //centreProche
+               // $donneur->centreProche = $this->getCentreProche($donneur->latitude, $donneur->longitude);
+               
                  $donneur->dons = $donneur->dons()->get() ?? "";
                   // Vérifier si le donneur a des dons
                 if ($donneur->dons->isNotEmpty()) {
@@ -74,19 +83,92 @@ class UrgencesController extends Controller
                     }
                 }
             }
-     $donneurs = $donneursFiltres??[];
-      /* $donneurs = Personne::where('idGroupage', $request->idGroupage)
-            ->with(['groupage', 'dons' => function ($query) {
-               $query->orderBy('date', 'desc'); 
-             }])
-             -> whereHas('dons', function ($query) {
-                // Critère 1 : Sérologie négative
-                $query->where('serologie', 0);  
-            })
-            
-           ->get();*/
-
-           return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes"));
+            $donneurs = $donneursFiltres??[];
+    
+         return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes"));
    }
- 
+   private function getCentreProche($lat, $lng)
+   {
+       $centres = DB::table('centres')->select('id', 'nom', 'latitude', 'longitude')->get();
+   
+       $plusProche = null;
+       $distanceMin = null;
+   
+       foreach ($centres as $centre) {
+           $distance = $this->calculerDistance($lat, $lng, $centre->latitude, $centre->longitude);
+   
+           if ($distanceMin === null || $distance < $distanceMin) {
+               $distanceMin = $distance;
+               $plusProche = $centre;
+           }
+       }
+   
+       if ($plusProche) {
+           $tempsMinutes = $this->estimerTempsTrajet($distanceMin); // estimer en minutes
+          
+           return [
+               'nom' => $plusProche->nom . ' (id : ' . $plusProche->id . ')',
+               'distance_km' => round($distanceMin, 2),
+               'temps_min' => round($tempsMinutes),
+           ];
+       }
+   
+       return null;
+   }
+   
+   private function estimerTempsTrajet($distanceKm)
+   {
+       $vitesseKmH = 60; // moyenne en voiture
+       return ($distanceKm / $vitesseKmH) * 60; // en minutes
+   }
+   private function calculerDistance($lat1, $lon1, $lat2, $lon2)
+   {
+       $earthRadius = 6371; // km
+   
+       $dLat = deg2rad($lat2 - $lat1);
+       $dLon = deg2rad($lon2 - $lon1);
+   
+       $a = sin($dLat/2) * sin($dLat/2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon/2) * sin($dLon/2);
+   
+       $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+   
+       return $earthRadius * $c;
+   }
+    
+    public function envoyerDemandes(Request $request)
+    {
+        //step 01 récupère les donneurs selon la recherche
+        $donneurs = json_decode($request->donneursList, true);
+     
+
+        //step 02: creer la demande type:urgent
+               
+        $idGroupage = $donneurs[0]['idGroupage']; //apres le fltre tous les donneurs ont le mme groupage
+        $idUserPersonneAuth=Auth::user()->idUser;
+       
+        $idDemandeur = DB::table('admin')
+        ->where('idPersonne', $idUserPersonneAuth)
+        ->value('id');
+  
+           Demande::create([
+            'dateDemande' => Carbon::now(),
+            'lieuDemande' => "",
+            'serviceMedical' => "",
+            'groupageDemande' => $idGroupage,
+            'quantiteDemande' => 1,
+            'typeMaladie' => "",
+            'idDemandeur' => $idDemandeur,
+            'numeroDossierMedical' => "",
+            'notes' => "",
+            'typeDemande' => "urgent",
+        ]);
+
+        
+        //step 03:  envoie les notifications aux donneurs trouvés
+       //TODO
+
+
+    }
 }

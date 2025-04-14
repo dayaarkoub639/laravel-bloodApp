@@ -5,25 +5,31 @@
  
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <style>
-        #map { height: 600px; width: 100%;z-index: 0; }
+        #map { height: 500px; width: 100%;z-index: 0; }
     </style>
     <div class="dashboard_content bg-light-4 container-fluid">
         
             <form class="row g-3"  action="{{ route('dons.search') }}" method="GET">    
             @csrf            
                 <div class="col-auto">
-                <select id='groupage' name='idGroupage' class="form-select" required>
-                <option value=''>Choisir le groupage</option>
-                @foreach ($listeGroupage as $key => $value)
-                <option value='{!! $value->id !!}'>{!! $value->type !!}</option>
-                @endforeach
-
-            </select> 
-      </div>
+                <label class="form-label">Choisir le groupage</label>
+                    <select id='groupage' name='idGroupage' class="form-select" required>
+                        <option value=''>Choisir le groupage</option>
+                        @foreach ($listeGroupage as $key => $value)
+                        <option value='{!! $value->id !!}'>{!! $value->type !!}</option>
+                        @endforeach
+                    </select> 
+                 </div>
+                 <div class="col-auto">
+                 <label class="form-label">Nombre Donneurs à rechercher</label>
+                 <input type="number" class="form-control" name="nbreDonneursDemande" placeholder="Nombre Donneurs à rechercher" value="3" >
+                 </div>
                 <div class="col-auto">
-                  <button type="submit" class="btn btn-primary mb-3 py-2">Chercher donneurs</button>
+                <br> 
+                  <button type="submit" class="btn btn-primary mb-3  mt-2">Chercher donneurs</button>
                 </div>
               </form>   
+              <br> <br>
               <div id="map"></div>
              <!-- <div class="map container-fluid">
                 <iframe 
@@ -57,7 +63,7 @@
                                  
                                         <tr>
                                             <td>{{ $donneur->idUser}}</td>
-                                            <td>2 Km</td>
+                                            <td>{{ $donneur->distanceKm}} Km</td>
                                             <td>{{ $donneur->numeroTlp1}}</td>
                                             <td><img width="24" height="24" src="https://img.icons8.com/color/48/drop-of-blood.png" alt="drop-of-blood"/>
                                             @if($donneur->groupage)
@@ -65,7 +71,7 @@
                                                 @else
                                                 N/A
                                                 @endif  </td>
-                                            <td>20 min</td>                                           
+                                            <td>{{ $donneur->tempsEstime}} min</td>                                           
                                         </tr>                                 
                                        
                                         @endforeach   
@@ -88,9 +94,7 @@
                                              
                                         </tr>
                                         <tr>
-                                            <td><p class="fw-semibold fs-4 text-center mb-0">{{ $totalDemandes}}</p></td>
-                                           
-                                           
+                                            <td><p class="fw-semibold fs-4 text-center mb-0">?</p></td>
                                         </tr>
                                    
                                      
@@ -119,15 +123,21 @@
                                    
                                     <tbody>
                                         <tr>
-                                            <td>
-                                                <form class="row g-3 d-lg-flex align-items-center justify-content-center">                
-                                                <div class="col-auto">
+                                            <td><br> 
+                                                <div class="row g-3 d-lg-flex align-items-center justify-content-center">                
+                                               <!-- <div class="col-auto">
                                                   <button type="submit" class="btn btn-light mb-3 py-2">Annuler</button>
-                                                </div>
+                                                </div>-->
+                                                <br>
                                                 <div class="col-auto">
-                                                  <a href="{{route('ajouter-demande')}}" class="btn btn-primary mb-3 py-2">Envoyer la demande</a>
+                                                    <form class="row g-3" style="padding-top: 10px"  method="POST"  action="{{ route('urgences.envoyerDemandes') }}">
+                                                        @csrf
+                                                        <input type="hidden" name="donneursList" value="{{ json_encode($donneurs) }}">
+                                                        <button type="submit" class="btn btn-primary mb-3 py-2 "   >Envoyer la demande</button>
+                                                    </form>
+                                                 
                                                 </div>
-                                              </form> 
+</div> 
                                             </td>
                                                                                   
                                         </tr>                                 
@@ -150,7 +160,7 @@
        <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 <script>
-    var map = L.map('map').setView([36.75, 3.06], 8); // Centre sur Algérie
+    var map = L.map('map').setView([36.75, 3.06], 7); // Centre sur Algérie
 
     // Ajouter une carte OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

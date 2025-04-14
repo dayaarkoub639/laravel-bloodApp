@@ -26,6 +26,7 @@
 
 ### Lancer le serveur 
 - php artisan serve
+php artisan queue:work   
 
 ### Effacer le cache
 - php artisan config:clear

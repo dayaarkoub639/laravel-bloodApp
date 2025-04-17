@@ -195,6 +195,26 @@
                         {{ $personne->observations }}
                     </p>
                 </div>
+                @if($personne->user!=null)
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label observation">Utilisateur</label>
+                    <p class="form-control-plaintext">
+                    <b>  Pseudo: </b> <br>{{ $personne->user()->value('pseudo') }}
+                    </p>
+                    <p class="form-control-plaintext">
+                    <b>Note </b><br>
+                      
+
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= $personne->user()->value('noteEtoile'))
+                                <span style="color: gold; font-size: 20px;">&#9733;</span>   
+                            @else
+                                <span style="color: lightgray; font-size: 20px;">&#9733;</span>  
+                            @endif
+                        @endfor
+                    </p>
+                </div>
+                @endif
             </form>
         </div>
 
@@ -256,7 +276,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Date & Heure</th>
-                                    <th scope="col">Lieu de don</th>
+                                    <th scope="col">Source Don</th>
                                     <th scope="col">Pds</th>
                                     <th scope="col">N° flacon</th>
                                     <th scope="col">C C</th>
@@ -271,7 +291,12 @@
                                 <tr>
                                     <th scope="row">{!! $don->idDon !!}</th>
                                     <td>{!! $don->date !!}</td>
-                                    <td>{!! $don->lieuDon !!}</td>
+                                    <td>
+
+                                    <p class="mt-1 badge rounded-pill text-primary border border-primary bg-transparent">
+    {{ $don->sourceDon }}
+</p>
+                                    </td>
                                     <td>{!! $don->Pds !!}Kg</td>
                                     <td>{!! $don->numeroFlacon !!}</td>
                                     <td>{!! $don->C !!}</td>
@@ -281,22 +306,46 @@
 
                                     <td class="opt">
 
-                                        <button class="btn btn-sm btn-outline-primary">
+                                        <button class="btn btn-sm btn-primary"  style="color:white; ;">
                                             <a href="{{ url('dons/modifier/'.$don->idDon) }}"><i
-                                                    class="ti ti-edit text-primary fs-4"></i></a>
+                                                    class="ti ti-edit  fs-4"  style="color:white; font-size:16px;"></i></a>
                                         </button>
 
+                                      
                                         <form id="delete-form-{{ $don->idDon }}" class="d-inline"
                                             action="{{ url('dons/supprimer/' . $don->idDon) }}" method="POST">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}
 
-                                            <button type="button" class="btn btn-sm btn-primary delete-btn"
+                                            <button type="button" class="btn btn-sm btn-outline-primary delete-btn"
                                                 data-id="{{ $don->idDon }}">
-                                                <i class="ti ti-trash" style="color:white; font-size:16px;"></i>
+                                                <i class="ti ti-trash" style="  font-size:16px;"></i>
                                             </button>
                                         </form>
+                                        @if($don->sourceDon!="Ami" && $don->donIsNote==false)
+                                        <form id="noter-form-{{ $don->idDon }}" class="d-inline"
+                                            action="{{ url('dons/noter/' . $don->idDon) }}" method="POST">
+                                            {{ csrf_field() }}
+                                            {{ method_field('PUT') }}
 
+                                            <button type="button" class="btn btn-sm btn-primary noter-btn"
+                                                data-id="{{ $don->idDon }}">
+                                                <i class="ti ti-star" style="color:white; font-size:16px;"></i>
+                                            </button>
+                                        </form>
+                                       @endif
+                                       @if($don->sourceDon!="Ami" && $don->donIsNote==true)
+                                        <form id="decrementerNote-form-{{ $don->idDon }}" class="d-inline"
+                                            action="{{ url('dons/decrementerNote/' . $don->idDon) }}" method="POST">
+                                            {{ csrf_field() }}
+                                            {{ method_field('PUT') }}
+
+                                            <button type="button" class="btn btn-sm btn-outline-primary decrementerNote-btn"
+                                                data-id="{{ $don->idDon }}">
+                                                <i class="ti ti-star-off" style=" font-size:16px;"></i>
+                                            </button>
+                                        </form>
+                                       @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -324,6 +373,49 @@
                     confirmButtonColor: "#d33",
                     cancelButtonColor: "#3085d6",
                     confirmButtonText: "Oui, supprimer !",
+                    cancelButtonText: "Annuler"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.noter-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                let donId = this.getAttribute('data-id');
+                let form = document.getElementById('noter-form-' + donId);
+
+                Swal.fire({
+                    title: "Êtes-vous sûr d'ajouter une note (+1)?",
+                    text: "Cette action est irréversible !",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Oui, Noter !",
+                    cancelButtonText: "Annuler"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+        document.querySelectorAll('.decrementerNote-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                let donId = this.getAttribute('data-id');
+                let form = document.getElementById('decrementerNote-form-' + donId);
+
+                Swal.fire({
+                    title: "Êtes-vous sûr de supprimer cette note pour ce don?",
+                    text: "Cette action est irréversible !",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Oui !",
                     cancelButtonText: "Annuler"
                 }).then((result) => {
                     if (result.isConfirmed) {

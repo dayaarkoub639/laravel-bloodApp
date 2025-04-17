@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Events\BloodRequestEvent;
 
 class UrgencesController extends Controller
 {
@@ -26,6 +27,7 @@ class UrgencesController extends Controller
        $request->validate([
            'idGroupage' => 'required|integer|exists:groupage,id',
            'nbreDonneursDemande' => 'required',
+           
        ]);
        $listeGroupage= Groupage::all(); 
        $totalDons = Don::count();
@@ -50,7 +52,7 @@ class UrgencesController extends Controller
      
             $donneurs = $donneurs->take($request->nbreDonneursDemande);
             foreach ($donneurs as $donneur) {
-                //TODO la distance et le temps
+                //done la distance et le temps
                 $centreInfos = $this->getCentreProche($donneur->latitude, $donneur->longitude);
  
                 if ($centreInfos) {
@@ -58,9 +60,20 @@ class UrgencesController extends Controller
                     $donneur->distanceKm = $centreInfos['distance_km'];
                     $donneur->tempsEstime = $centreInfos['temps_min'];
                 }
-                //centreProche
-               // $donneur->centreProche = $this->getCentreProche($donneur->latitude, $donneur->longitude);
-               
+              // Préparer les données pour l'événement
+               $eventData = [
+                'groupage' => $request->idGroupage,
+                'position' => "{$donneur->latitude},{$donneur->longitude}",
+                'message' => "Besoin urgent de sang du groupage id {$request->groupage} !",
+                'user_id' =>  $donneur->id, 
+                'demandeurId' =>  $request->idDemandeur, 
+                'centreProche' =>  $donneur->centreProche, 
+            
+            ];
+
+
+             // Diffuser l'événement
+           event(new BloodRequestEvent($eventData));
                  $donneur->dons = $donneur->dons()->get() ?? "";
                   // Vérifier si le donneur a des dons
                 if ($donneur->dons->isNotEmpty()) {

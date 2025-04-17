@@ -19,6 +19,27 @@
                     <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
+            <div class="mb-4">
+    <label class="block text-gray-700 font-bold mb-2">Source du Don :</label>
+
+    <div class="flex items-center mb-2">
+        <input type="radio" id="source_app" name="sourceDon" value="App"
+               {{ old('sourceDon', $don->sourceDon ?? '') == 'App' ? 'checked' : '' }} class="mr-2">
+        <label for="source_app" class="cursor-pointer">App</label>
+    </div>
+
+    <div class="flex items-center mb-2">
+        <input type="radio" id="source_ami" name="sourceDon" value="Ami"
+               {{ old('sourceDon', $don->sourceDon ?? '') == 'Ami' ? 'checked' : '' }} class="mr-2">
+        <label for="source_ami" class="cursor-pointer">Ami</label>
+    </div>
+
+    <div class="flex items-center">
+        <input type="radio" id="source_volontaire" name="sourceDon" value="Volontaire"
+               {{ old('sourceDon', $don->sourceDon ?? '') == 'Volontaire' ? 'checked' : '' }} class="mr-2">
+        <label for="source_volontaire" class="cursor-pointer">Volontaire</label>
+    </div>
+</div>
 
             <!--<div class="col">
                 <label class="form-label">Lieu du don</label>

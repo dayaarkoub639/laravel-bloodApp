@@ -7,12 +7,16 @@ use App\Http\Controllers\API\Auth\ApiOtpController;
 use App\Http\Controllers\API\Auth\WilayaController;
 use App\Http\Controllers\API\BloodRequestController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\API\Auth\RecoverPhoneNumberController;
 /*
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
  */
+
+ Broadcast::routes(['middleware' => ['auth:sanctum']]);
+ 
 Route::post('/accepteDemande', [BloodRequestController::class, 'accepterDemande']);
 Route::post('/find-donors', [BloodRequestController::class, 'findNearbyDonors']); 
 Route::post('/update-location', [BloodRequestController::class, 'updateLocation']);

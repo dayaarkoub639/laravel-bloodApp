@@ -49,6 +49,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/ajouter', [DonController::class, 'store'])->name('dons.store');
         Route::get('/modifier/{id}', [DonController::class, 'edit'])->name('dons.edit');
         Route::put('/modifier/{id}', [DonController::class, 'update'])->name('dons.update');
+        Route::put('/noter/{id}', [DonController::class, 'noter'])->name('dons.noter');
+        Route::put('/decrementerNote/{id}', [DonController::class, 'decrementerNote'])->name('dons.decrementerNote');
         Route::delete('/supprimer/{id}', [DonController::class, 'destroy'])->name('dons.delete');
     });
 

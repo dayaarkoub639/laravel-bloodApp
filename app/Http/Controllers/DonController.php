@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\personneMedicale;
 use App\Models\Personne;
 use App\Models\Don;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DonController extends Controller
@@ -62,6 +63,8 @@ class DonController extends Controller
               'serologie' => $request->serologie,
               'obsMedicale' => $request->observations,
              
+              
+              'sourceDon' => $request->sourceDon,
               'support' => $request->support,
               'reactions' => $request->reactions,
               'idPersonneMedicale' =>  (int) $request->persMedicale  ,
@@ -87,23 +90,52 @@ class DonController extends Controller
      
         return view('dons.edit-don',compact( "listePersonneMedicale","don"));
      }
-  
+     public function noter(Request $request, $id)
+    {
 
+        //users 
+        $don = Don::where('idDon', $id)->first();
+        $user = User::where('keyIdUser', $don->idDonneur)->first();
+       
+        // Incrémenter la note
+        if (!$don->donIsNote) {
+            $user->noteEtoile = $user->noteEtoile + 1;
+            $user->save();
+            $don->donIsNote = true;
+            $don->save();
+        }
+       
+        return redirect('membres/fiche/'.$don->idDonneur)->with('success', 'Une note ajoutée avec succès !');
+     }
+
+     public function decrementerNote(Request $request, $id)
+    {
+
+        //users 
+        $don = Don::where('idDon', $id)->first();
+        $user = User::where('keyIdUser', $don->idDonneur)->first();
+        
+        // decrémenter la note
+        if ($don->donIsNote) {
+            $user->noteEtoile = $user->noteEtoile - 1;
+            $user->save();
+
+            $don->donIsNote = false;
+            $don->save();
+        }
+        return redirect('membres/fiche/'.$don->idDonneur)->with('success', 'Une note supprimé avec succès !');
+     }
    /**
      * Mettre à jour un don existant.
      */
     public function update(Request $request, $id)
     {
        
-        try{
-       
+        try{       
             $don = Don::findOrFail($id);
-         
             $don->update([
                 'date'         => $request->date,
-                //'lieuDon'      => $request->lieuDon,
                 'Pds' => (int) $request->Pds,
-              
                 'numeroFlacon' => $request->numeroFlacon,
                 'C'            => $request->C,
                 'TA'           => $request->TA,
@@ -113,11 +145,7 @@ class DonController extends Controller
                 'obsMedicale' => $request->observations,
                 'idPersonneMedicale' => $request->persMedicale,
                 'persMedicaleSuperviser' => $request->persMedicaleSuperviser,
-        
-           
-             
-              
-            ]);
+                'sourceDon' => $request->sourceDon ]);
 
             return redirect('/membres/fiche/'.$don->idDonneur)->with('success', 'Don modifié avec succès !');
         } catch (\Exception $e) {

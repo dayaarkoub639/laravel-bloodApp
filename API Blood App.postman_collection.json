@@ -26,7 +26,7 @@
 							"formdata": [
 								{
 									"key": "numeroTlp1",
-									"value": "2133222425257",
+									"value": "21351010101",
 									"type": "text"
 								},
 								{
@@ -108,7 +108,7 @@
 							"formdata": [
 								{
 									"key": "phone",
-									"value": "213562425257",
+									"value": "21351010101",
 									"type": "text"
 								},
 								{
@@ -149,7 +149,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    //\"NIN\": \"123456789\",\n    \"numeroTlp1\": \"21355010101\",\n    \"numeroTlp2\": \"\",\n    \"motDePasse\": \"securepassword\",\n    \"dateDeNess\": \"1990-01-01\",\n    \"gender\": 0,\n    //\"typePersonne\": \"user\",\n    \"pseudo\": \"Doe\",\n    \"idGroupage\":\"A+\",\n    \"wilaya_prof_id\":1,\n    \"commune_prof_id\":1,\n    \"wilaya_domicile_id\":15,\n    \"commune_domicile_id\":1\n    \n}\n",
+							"raw": "{\n    //\"NIN\": \"123456789\",\n    \"numeroTlp1\": \"21377777777\",\n    \"numeroTlp2\": \"\",\n    \"motDePasse\": \"password\",\n    \"dateDeNess\": \"1990-01-01\",\n    \"gender\": 0,\n    \"typePersonne\": \"user\",\n    \"pseudo\": \"0707don\",\n    \"idGroupage\":\"B+\",\n    \"wilaya_prof_id\":1,\n    \"commune_prof_id\":1,\n    \"wilaya_domicile_id\":15,\n    \"commune_domicile_id\":1\n    \n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -190,7 +190,7 @@
 							"formdata": [
 								{
 									"key": "numeroTlp1",
-									"value": "066565631212",
+									"value": "21351010101",
 									"type": "text"
 								}
 							]
@@ -225,7 +225,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/get-pseudos/213562425257",
+							"raw": "http://127.0.0.1:8000/api/get-pseudos/21351010101",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -237,7 +237,7 @@
 							"path": [
 								"api",
 								"get-pseudos",
-								"213562425257"
+								"21351010101"
 							]
 						}
 					},
@@ -249,7 +249,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/get-last-dons/213561425257",
+							"raw": "http://127.0.0.1:8000/api/get-last-dons/21351010101",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -261,7 +261,7 @@
 							"path": [
 								"api",
 								"get-last-dons",
-								"213561425257"
+								"21351010101"
 							]
 						}
 					},
@@ -274,7 +274,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{    \n    \"phone\": \"21355010101\",\n    \"groupage\":\"A+\",\n    \"dateNaissance\":\"1990-01-01\",\n    \"pseudo\":\"DoeD0y\", \n    \"lastDon\":\"Jamais fait de don\"\n    \n}\n",
+							"raw": "{    \n    \"phone\": \"21351010101\",\n    \"groupage\":\"A+\",\n    \"dateNaissance\":\"1990-01-01\",\n    \"pseudo\":\"Meriem\", \n    \"lastDon\":\"Jamais fait de don\"\n    \n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -355,6 +355,158 @@
 						"api",
 						"communes",
 						"02"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getProches Donneur/create deamndes",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"groupage\": \"3\",\n    \"currentUserPosition\": \"36.7335,3.9608\",\n    \"idDemandeur\":3\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/find-donors",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"find-donors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update positions",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idUser\": \"10700004\",\n    \"longitude\": \"32.7169\",\n    \"latitude\": \"3.9962\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/update-location",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"update-location"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "accepte demande",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idUser\": \"01500008\",\n    \"idDemande\": \"6\"\n   \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/accepteDemande",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"accepteDemande"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update phone",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"numeroTlp1\": \"0600000001\",\n  \"idPersonne\":\"01500007\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/updatePhone",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"updatePhone"
 					]
 				}
 			},

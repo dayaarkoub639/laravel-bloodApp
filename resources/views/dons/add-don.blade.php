@@ -18,7 +18,8 @@
                 {{ $errors->first('dateDon') }}
             </small>
           @endif
-                            </div>
+         </div>
+     
        <!--   <div class="col">
             <label for="lieuDon" class="form-label">Lieu don</label>
             <input type="text" class="form-control" id="lieuDon" name="lieuDon">
@@ -62,6 +63,7 @@
             </small>
           @endif
           </div>
+          
           <div class="col-md-3">
             <label for="inputCity" class="form-label">T A</label>
             <input type="text" class="form-control" name="TA">
@@ -95,6 +97,33 @@
                 {{ $errors->first('support') }}
             </small>
           @endif
+          </div>
+        <br>
+          <div class="row">
+ 
+
+
+         <div class="col mb-4">
+         
+            <label class="block text-gray-700 font-bold mb-2">Source du Don :</label>
+
+            <div class="flex items-center mb-2">
+                <input type="radio" id="source_app" name="sourceDon" value="App" class="mr-2">
+                <label for="source_app" class="cursor-pointer">App</label>
+            </div>
+
+            <div class="flex items-center mb-2">
+                <input type="radio" id="source_ami" name="sourceDon" value="Ami" class="mr-2">
+                <label for="source_ami" class="cursor-pointer">Ami</label>
+            </div>
+
+            <div class="flex items-center">
+                <input type="radio" id="source_volontaire" name="sourceDon" value="Volontaire" class="mr-2">
+                <label for="source_volontaire" class="cursor-pointer">Volontaire</label>
+            </div>
+ 
+
+         </div>
           </div>
           <div class="mb-3">
               <label for="exampleFormControlTextarea1" class="form-label">Réactions</label>

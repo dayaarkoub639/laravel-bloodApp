@@ -23,7 +23,8 @@ class BloodRequestEvent implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        //return new Channel('blood-requests');// Canal public
+       
+       // return new Channel('user.11');// Canal public
         // Utilisation d'un canal privé basé sur l'ID de l'utilisateur
         return new PrivateChannel('user.' . $this->data['user_id']);
     }

@@ -226,8 +226,8 @@ class MembreController extends Controller
                 'kell' => (int) $request->phenotypeKell,
                 //compte
                 'typePersonne' => $request->type_personne,
-                'idCentre' => $request->idCentre,
-                'motDePasse' => Hash::make($request->type_personne),
+               
+                'motDePasse' => Hash::make($request->motDePasse),
                 'accept_sendsms' =>  0,
 
 
@@ -238,7 +238,7 @@ class MembreController extends Controller
                 // Créer une entrée dans la table `users`
                 $user = User::create([
                     'keyIdUser' => $idCustom,
-                    'pseudo' => $request->pseudo,
+                    'pseudo' => $request->pseudo
                 ]);
             }
             if ($request->type_personne == "admin") {
@@ -246,6 +246,7 @@ class MembreController extends Controller
                 $user = Admin::create([
                     'idPersonne' => $idCustom,
                     'acces' => $request->acces,
+                    'idCentre' => $request->idCentre,
                 ]);
             }
             if ($request->type_personne == "personnelMedical") {
@@ -254,6 +255,7 @@ class MembreController extends Controller
                     'idPersonne' => $idCustom,
                     'fonction' => $request->fonction,
                     'role' =>  $request->role,
+                    'idCentre' => $request->idCentre,
                 ]);
             }
 
@@ -333,7 +335,7 @@ class MembreController extends Controller
             'wilaya_prof_id' => $request->wilayaProfessionnelle,
             'lieuNaissance' => $request->lieuNaissance,
             'epouseDe' => $request->epouseDe,
-            'idCentre' => $request->idCentre,
+         
             //groupage
             'idGroupage' => (int)$request->groupage,
             'cMaj' => (int) $request->phenotypeCmaj,
@@ -343,11 +345,39 @@ class MembreController extends Controller
             'kell' => (int)$request->phenotypeKell,
             //compte
             'typePersonne' => $request->type_personne,
-            'motDePasse' => Hash::make($request->type_personne),
+            'motDePasse' => Hash::make($request->motDePasse),
 
 
         ]);
+        if ($personne->typePersonne == "user") {
+            // Créer une entrée dans la table `users`
+            $user = User::where('keyIdUser', $id)->first();
 
+            $user->update([
+           
+                'pseudo' => $request->pseudo
+            ]);
+        }
+        if ($personne->typePersonne == "admin") {
+            // Créer une entrée dans la table `users`
+            $admib = Admin::where('idPersonne', $id)->first();
+
+            $admib ->update([
+                
+                'acces' => $request->acces,
+                'idCentre' => $request->idCentre,
+            ]);
+        }
+        if ($personne->typePersonne == "personnelMedical") {
+            $personneMedicale = personneMedicale::where('idPersonne', $id)->first();
+
+            $personneMedicale->update([
+
+                'fonction' => $request->fonction,
+                'role' =>  $request->role,
+                'idCentre' => $request->idCentre,
+            ]);
+        }
 
         return redirect()->route('membres')->with('success', 'Membre mis à jour avec succès.');
     }

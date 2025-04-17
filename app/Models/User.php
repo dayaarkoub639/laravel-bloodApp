@@ -12,7 +12,8 @@ class User extends Personne
 
     protected $fillable = [
         'pseudo', 
-        'keyIdUser'
+        'keyIdUser',
+        'noteEtoile'
     ];
     public function getKeyIdUserAttribute($value)
     {

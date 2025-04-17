@@ -36,6 +36,8 @@ class Don extends Model
         'obsMedicale',
         'numeroFlacon',
         'reactions', 
+        'sourceDon',
+        'donIsNote',
         'idDonneur',
         'idPersonneMedicale'
     ];

@@ -7,6 +7,7 @@ use App\Models\Groupage;
 use App\Models\Personne;
 use App\Models\Don;
 use App\Models\Demande;
+use App\Models\Admin;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +21,11 @@ class UrgencesController extends Controller
     $donneurs = [];
     $totalDons = count($donneurs);
     $totalDemandes = Demande::count();
-    return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes"));
+    $admin=Admin::where('idPersonne',Auth::user()->idUser)->first();
+    $centre = DB::table('centres')->select('id', 'nom', 'latitude', 'longitude')->where('id',$admin->idCentre)->first();
+    $pointA = ['lat' => $centre->latitude, 'lon' => $centre->longitude]; 
+    $nomCentre =  $centre->nom; 
+    return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes",'pointA',"nomCentre"));
    }
    public function searchByGroupage(Request $request)
    {
@@ -34,7 +39,7 @@ class UrgencesController extends Controller
        $totalDemandes = Demande::count();
        // Récupérer les donneurs ayant l'idGroupage donné avec leurs dons
        $dateLimite = Carbon::now()->subMonths(3);
-           
+            
             // Requête pour trouver les utilisateurs donneurs compatibles
             $donneurs = Personne::where('idGroupage', $request->idGroupage)
             
@@ -44,9 +49,9 @@ class UrgencesController extends Controller
                ->get();
                
               
-                   // Si aucun donneur trouvé
+              // Si aucun donneur trouvé
             if ($donneurs->isEmpty()) {
-                return response()->json(['message' => 'Aucun donneur trouvé à proximité'], 404);
+                return redirect()->back()->with('error', 'Aucun donneur trouvé à proximité');
             }
         
      
@@ -61,19 +66,20 @@ class UrgencesController extends Controller
                     $donneur->tempsEstime = $centreInfos['temps_min'];
                 }
               // Préparer les données pour l'événement
-               $eventData = [
-                'groupage' => $request->idGroupage,
-                'position' => "{$donneur->latitude},{$donneur->longitude}",
-                'message' => "Besoin urgent de sang du groupage id {$request->groupage} !",
-                'user_id' =>  $donneur->id, 
-                'demandeurId' =>  $request->idDemandeur, 
-                'centreProche' =>  $donneur->centreProche, 
-            
-            ];
+                    $eventData = [
+                        'groupage' => $request->idGroupage,
+                        'position' => "{$donneur->latitude},{$donneur->longitude}",
+                        'message' => "Besoin urgent de sang du groupage id {$request->groupage} !",
+                        'user_id' =>  $donneur->id, 
+                        'demandeurId' =>  $request->idDemandeur, 
+                        'centreProche' =>  $donneur->centreProche, 
+                         
+                    
+                    ];
 
 
-             // Diffuser l'événement
-           event(new BloodRequestEvent($eventData));
+                    // Diffuser l'événement
+                event(new BloodRequestEvent($eventData));
                  $donneur->dons = $donneur->dons()->get() ?? "";
                   // Vérifier si le donneur a des dons
                 if ($donneur->dons->isNotEmpty()) {
@@ -97,24 +103,29 @@ class UrgencesController extends Controller
                 }
             }
             $donneurs = $donneursFiltres??[];
-    
-         return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes"));
+            
+            $admin=Admin::where('idPersonne',Auth::user()->idUser)->first();
+            $centre = DB::table('centres')->select('id', 'nom', 'latitude', 'longitude')->where('id',$admin->idCentre)->first();
+            $pointA = ['lat' => $centre->latitude, 'lon' => $centre->longitude]; 
+            $admin=Admin::where('idPersonne',Auth::user()->idUser)->first();
+            $nomCentre =  $centre->nom; 
+            return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes",'pointA',"nomCentre"));;
    }
    private function getCentreProche($lat, $lng)
    {
-       $centres = DB::table('centres')->select('id', 'nom', 'latitude', 'longitude')->get();
+     $admin=Admin::where('idPersonne',Auth::user()->idUser)->first();
+       $centre = DB::table('centres')->select('id', 'nom', 'latitude', 'longitude')->where('id',$admin->idCentre)->first();
    
        $plusProche = null;
        $distanceMin = null;
-   
-       foreach ($centres as $centre) {
+    
            $distance = $this->calculerDistance($lat, $lng, $centre->latitude, $centre->longitude);
    
            if ($distanceMin === null || $distance < $distanceMin) {
                $distanceMin = $distance;
                $plusProche = $centre;
            }
-       }
+        
    
        if ($plusProche) {
            $tempsMinutes = $this->estimerTempsTrajet($distanceMin); // estimer en minutes
@@ -153,12 +164,16 @@ class UrgencesController extends Controller
     public function envoyerDemandes(Request $request)
     {
         //step 01 récupère les donneurs selon la recherche
-        $donneurs = json_decode($request->donneursList, true);
+        $donneursf = json_decode($request->donneursList, true);
+        
+        if(count($donneursf) ==0){
+            return redirect()->back()->with('error', 'Aucun donneur trouvé à proximité');
+        }
      
 
         //step 02: creer la demande type:urgent
                
-        $idGroupage = $donneurs[0]['idGroupage']; //apres le fltre tous les donneurs ont le mme groupage
+        $idGroupage = $donneursf[0]['idGroupage']; //apres le fltre tous les donneurs ont le mme groupage
         $idUserPersonneAuth=Auth::user()->idUser;
        
         $idDemandeur = DB::table('admin')
@@ -183,5 +198,9 @@ class UrgencesController extends Controller
        //TODO
 
 
+       //rediretion
+    
+
+       return redirect()->back()->with('success', 'Demande(s) envoyée(d) avec succès.');;
     }
 }

@@ -38,9 +38,12 @@ return [
         'options' => [
             'cluster' => "eu",
             'useTLS' => false, // peut être true si tu utilises HTTPS
+            'encrypted' => false, // peut être true si tu utilises HTTPS
        
-           
-            'scheme' => 'http', // change en https si tu utilises TLS
+         
+           // 'host' => '127.0.0.1', 
+         
+            'scheme' => 'http', 
 
     
         ],

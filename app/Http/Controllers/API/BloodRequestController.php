@@ -39,7 +39,7 @@ class BloodRequestController extends Controller
                 sin( radians( latitude ) ) ) ) AS distance",
                 [$latitude, $longitude, $latitude]
             )
-            ->having('distance', '<', 100) // 100 km de rayon
+            ->having('distance', '<', 100) // 20 km de rayon
             
             ->get();
             
@@ -52,7 +52,7 @@ class BloodRequestController extends Controller
             // Si tu veux retourner avec distance triée, décommente et adapte ci-dessous :
         $donneurs = $donneurs->sortBy('distance')->values();
         $donneurs = $donneurs->take(3);
-        
+        $donneursFiltres=[];
         foreach ($donneurs as $donneur) {
            
             $donneur->distance = $this->calculerDistance($latitude, $longitude, $donneur->latitude, $donneur->longitude);
@@ -68,15 +68,19 @@ class BloodRequestController extends Controller
     'groupage' => $request->groupage,
     'position' => "{$donneur->latitude},{$donneur->longitude}",
     'message' => "Besoin urgent de sang du groupe id {$request->groupage} !",
-    'user_id' =>  $donneur->user()->value('id'), 
+    'user_id' =>  $donneur->idUser, 
     'demandeurId' =>  $request->idDemandeur, 
     'centreProche' =>  $donneur->centreProche, 
 
 ];
 
-
+ 
  // Diffuser l'événement
-event(new BloodRequestEvent($eventData));
+ //event(new BloodRequestEvent($eventData));
+
+ 
+ broadcast(new BloodRequestEvent($eventData));
+
             //    }
             
           
@@ -97,7 +101,7 @@ event(new BloodRequestEvent($eventData));
                 $diffInMonths = $latestDate->diffInMonths($currentDate);
 
                 // Vérifier si le dernier don est dans les 3 derniers mois
-                if ($diffInMonths > 3) {
+                if ($diffInMonths <= 3) {
                     // Ajouter le donneur à la liste des donneurs filtrés
                     $donneursFiltres[] = $donneur;
                 }

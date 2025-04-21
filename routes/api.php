@@ -15,7 +15,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
  */
 
- Broadcast::routes(['middleware' => ['auth:sanctum']]);
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
  
 Route::post('/accepteDemande', [BloodRequestController::class, 'accepterDemande']);
 Route::post('/find-donors', [BloodRequestController::class, 'findNearbyDonors']); 

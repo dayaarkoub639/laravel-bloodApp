@@ -7,12 +7,16 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\PrivateChannel;
-
-class BloodRequestEvent implements ShouldBroadcast
+use Illuminate\Queue\InteractsWithQueue;
+class BloodRequestEvent implements ShouldBroadcast,ShouldQueue
 {
-    use Dispatchable, InteractsWithSockets,SerializesModels;
+    use Dispatchable, InteractsWithSockets,SerializesModels,InteractsWithQueue;
+   
+
+ 
 
     public $data;
 
@@ -31,7 +35,14 @@ class BloodRequestEvent implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return 'new-blood-request';// Nom de l'événement
+        return 'blood-request.created';// Nom de l'événement
     }
+    public function broadcastWith()
+    {
+        return [
+            'data' => $this->data
+        ];
+    }
+
 }
 

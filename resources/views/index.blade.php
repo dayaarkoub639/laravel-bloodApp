@@ -26,8 +26,8 @@
       cluster: 'eu'
     });
 
-    var channel = pusher.subscribe('blood-requests');
-    channel.bind('new-blood-request', function(data) {
+    var channel = pusher.subscribe('private-user.01500008');
+    channel.bind('blood-request.created', function(data) {
       alert(JSON.stringify(data));
       updateNotificationBadge();
     });

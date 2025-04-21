@@ -7,5 +7,5 @@ Broadcast::channel('blood-requests', function ($user) {
 });*/
  
 Broadcast::channel('user.{userId}', function ($user, $userId) {
-    return $user->id === $userId;
+    return (int) $user->idUser === (int) $userId;
   });

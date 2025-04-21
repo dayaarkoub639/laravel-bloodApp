@@ -96,7 +96,7 @@ class UrgencesController extends Controller
                     $diffInMonths = $latestDate->diffInMonths($currentDate);
 
                     // Vérifier si le dernier don est dans les 3 derniers mois
-                    if ($diffInMonths > 3) {
+                    if ($diffInMonths   <= 3) {
                         // Ajouter le donneur à la liste des donneurs filtrés
                         $donneursFiltres[] = $donneur;
                     }

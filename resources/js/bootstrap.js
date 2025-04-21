@@ -12,15 +12,21 @@ window.Echo = new Echo({
     broadcaster: 'pusher',
     key: '3abca8d045835fc7ea6d',
     cluster: 'eu',
-    forceTLS: true
+    forceTLS: false,
+    authEndpoint: '/api/broadcasting/auth',
+    auth: {
+        headers: {
+            Authorization: 'Bearer 120|nwdHp8KZHWx91EmY8pdyOkzFeqVaLzCJFOqSBXY814625bc9' // si tu stockes le token ici
+        }
+    }
 });
 
 // Écouter l'événement  
  
- //Si le canal est public //pour tous les admins peut ecouter
-var channel = Echo.channel('blood-requests');
-channel.listen('.new-blood-request', function(data) {
-    alert('Nouvelle demande de sang : ' + data.message);
-    alert(JSON.stringify(data));
-    
-}); 
+/**
+ * Echo exposes an expressive API for subscribing to channels and listening
+ * for events that are broadcast by Laravel. Echo and event broadcasting
+ * allow your team to quickly build robust real-time web applications.
+ */
+
+import './echo';

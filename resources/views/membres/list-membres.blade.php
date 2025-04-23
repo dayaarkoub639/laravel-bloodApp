@@ -74,9 +74,11 @@
             <div id="collapseFilters" class="accordion-collapse collapse show" aria-labelledby="headingFilters"
                 data-bs-parent="#filterAccordion">
                 <div class="accordion-body">
+         
+              
                     <form class="container" method="POST" action="{{ route('membres.searchAdvanced') }}">
                         @csrf
-
+                       
                         <!-- Recherche -->
                         <div class="mb-4">
                             <label for="search-input" class="form-label">Rechercher un membre</label>
@@ -181,8 +183,13 @@
                                 </select>
                             </div>
                         </div>
-                    </form>
-
+                    </form><br><br>
+                    <form class="container" method="POST" action="{{ route('membres.searchAdvanced') }}">
+                @csrf
+                <button type="submit"    class="btn btn-outline-secondary btn-sm">
+                        <i class="ti ti-arrow-loop-left"></i> Effacer les données de recheche
+                    </button>
+                </form>
 
                 </div> <!-- /.accordion-body -->
             </div>

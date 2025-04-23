@@ -36,22 +36,12 @@ class MembreController extends Controller
 
     public function searchAdvanced(Request $request)
     {
-           
+          
         $dateLimite = Carbon::now()->subMonths(3);
-        $query = Personne::query()
-        ->whereHas('dons', function ($query) use ($dateLimite) {
-            $query->where('serologie', 0);
-        });
+        $query = Personne::query();
         // Recherche générale
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('nom', 'like', "%$search%")
-                    ->orWhere('prenom', 'like', "%$search%")
-                ;
-            });
-        }
-
+     
+     
         // Groupage sanguin
         if ($request->filled('groupage')) {
             $query->where('idGroupage', $request->input('groupage'));
@@ -89,32 +79,19 @@ class MembreController extends Controller
             $query->where('commune_domicile_id', $request->input('commune'));
         }
 
-      
-        $users = $query->get();
-        foreach ($users as $donneur) {
-            $donneur->dons = $donneur->dons()->get() ?? "";
-              // Vérifier si le donneur a des dons
-            if ($donneur->dons->isNotEmpty()) {
-                // Trier les dons par date décroissante et prendre le premier (le plus récent)
-                $latestDon = $donneur->dons->sortByDesc('date')->first();
-                
-                // Convertir la date du dernier don en instance de Carbon
-                $latestDate = Carbon::parse($latestDon->date);
-                
-                // Date actuelle
-                $currentDate = Carbon::now();
-                
-                // Calculer la différence entre la date actuelle et la date du dernier don
-                $diffInMonths = $latestDate->diffInMonths($currentDate);
+        if ($request->filled('search')) {
+            $search = strtolower($request->input('search'));
 
-                // Vérifier si le dernier don est dans les 3 derniers mois
-                if ($diffInMonths > 3) {
-                    // Ajouter le donneur à la liste des donneurs filtrés
-                    $donneursFiltres[] = $donneur;
-                }
-            }
-        }
-        $users = $donneursFiltres??[];
+        $query->join('users', 'personnes.idUser', '=', 'users.keyIdUser')
+        ->where(function ($q) use ($search) {
+            $q->whereRaw('LOWER(personnes.nom) LIKE ?', ["%$search%"])
+              ->orWhereRaw('LOWER(personnes.prenom) LIKE ?', ["%$search%"])
+              ->orWhereRaw('LOWER(personnes.idUser) LIKE ?', ["%$search%"])
+              ->orWhereRaw('LOWER(users.pseudo) LIKE ?', ["%$search%"]);
+        });
+    }
+        $users = $query->get();
+      
         $listeGroupage = Groupage::all();
         $listeWilayas = Wilaya::all();
         $listeCommune = Commune::all();

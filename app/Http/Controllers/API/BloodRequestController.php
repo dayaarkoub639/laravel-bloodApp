@@ -63,28 +63,22 @@ class BloodRequestController extends Controller
                 // done récupérer la date la plus récente, puis comparer cette date avec la date actuelle. 
             
                 //if($donneur->user()->value('id')=="11"){//for test
-   // Préparer les données pour l'événement
-   $eventData = [
-    'groupage' => $request->groupage,
-    'position' => "{$donneur->latitude},{$donneur->longitude}",
-    'message' => "Besoin urgent de sang du groupe id {$request->groupage} !",
-    'user_id' =>  $donneur->idUser, 
-    'demandeurId' =>  $request->idDemandeur, 
-    'centreProche' =>  $donneur->centreProche, 
+                // Préparer les données pour l'événement
+                $eventData = [
+                    'groupage' => $request->groupage,
+                    'position' => "{$donneur->latitude},{$donneur->longitude}",
+                    'message' => "Besoin urgent de sang du groupe id {$request->groupage} !",
+                    'user_id' =>  $donneur->idUser, 
+                    'demandeurId' =>  $request->idDemandeur, 
+                    'centreProche' =>  $donneur->centreProche, 
 
-];
+                ];
 
- 
- // Diffuser l'événement
- //event(new BloodRequestEvent($eventData));
-
- 
- broadcast(new BloodRequestEvent($eventData));
-
-            //    }
-            
-          
-          
+                
+                // Diffuser l'événement 
+                
+                broadcast(new BloodRequestEvent($eventData)); 
+                
                 $donneur->dons = $donneur->dons()->get() ?? "";
                 // Vérifier si le donneur a des dons
             if ($donneur->dons->isNotEmpty()) {

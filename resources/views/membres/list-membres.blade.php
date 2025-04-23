@@ -83,7 +83,7 @@
                             <div class="input-group">
                                 <input
                                     class="form-control"
-                                    type="search"
+                                    type="text"
                                     id="search-input"
                                     name="search"
                                     placeholder="Chercher par nom, prénom ou pseudo ..."

@@ -131,12 +131,24 @@ $lastRecord = Personne::latest('created_at')->first();
                 'keyIdUser' => $idCustom,
                 'pseudo' => $validated['pseudo'],
             ]);
+              
+
+              // Vérifier si la personne existe et si le mot de passe est correct
+              if (!$personne || !Hash::check($validated['motDePasse'], $personne->motDePasse)) {
+                  return response()->json([
+                      'message' => 'Identifiants invalides.',
+                  ], 401); // Unauthorized
+              }
+  
+              // Générer un token d'authentification
+              $token = $personne->createToken('auth_token')->plainTextToken;
 
             // Confirmer la transaction
             \DB::commit();
 
             return response()->json([
                 'message' => 'Utilisateur créé avec succès.',
+                'token' => $token,
                 'user' => $user,
                 'personne' => $personne,
             ], 201);

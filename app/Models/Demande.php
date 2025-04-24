@@ -16,7 +16,7 @@ class Demande extends Model
 
     protected $fillable = [
         'dateDemande',
-        
+        'nbreDonneursEnvoyes',
         'lieuDemande',
         'serviceMedical',
         'groupageDemande',
@@ -30,8 +30,19 @@ class Demande extends Model
 
     public function demandeur()
     {
-        return $this->belongsTo(User::class, 'idDemandeur');
+
+        //if user or admin or personnel medical
+        //dd($this->idDemandeur)
+
+        if(true){
+            return $this->belongsTo(User::class, 'idDemandeur');
+        }else{
+            return $this->belongsTo(Admin::class, 'idDemandeur');
+        }
+      
+  
     }
+   
    
       public function groupage()
       {

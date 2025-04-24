@@ -232,17 +232,21 @@ class BloodRequestController extends Controller
             ]);
 
             // Créer la notification dans la base de données
-            $notification = [
-                'title' => 'Demande acceptée',
-                'body' => 'qq un a accpeter une demande  de sang',
-                'data' => ['idDemandeur' => $demande_id,
+            
+               // Préparer les données pour l'événement
+               $eventData = [
+             
+                'message' => "Demande acceptée !",
+                'idDemandeur' => $demande_id,
                 'idCentreProche' => $this->getCentreProche($personne->latitude, $personne->longitude),
-                'idPersonne' => $request->idUser] // données supplémentaires
+                'idPersonne' => $request->idUser
+
             ];
 
-            // Déclencher l'événement
-            event(new NewNotificationUserEvent($request->idUser,
-             $notification));
+            
+            // Diffuser l'événement 
+            
+            broadcast(new BloodRequestEvent($eventData)); 
             return response()->json([
                 'success' => true,
                 'message' => 'Demande accepté',

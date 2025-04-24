@@ -84,7 +84,34 @@
                         </tbody>
                     </table>
                 </div>
-
+                <div class="card card-body p-4 col-sm-12 col-lg-2 d-flex align-items-center">
+                                <table id="datatablesSimple">                                  
+                                    <tbody>
+                                        <tr>
+                                            <td><p class="static text-center mb-0">{{ count($donneurs)}}</p></td>
+                                                                                   
+                                        </tr>                                 
+                                     
+                                        <tr>
+                                            <td class="text-center pb-4">Donneurs</td>
+                                             
+                                        </tr>
+                                        <tr>
+                                            <td><p class="static text-center mb-0">03</p></td>
+                                           
+                                           
+                                        </tr>
+                                   
+                                     
+                                        <tr>
+                                            <td class="text-center">Demandes</td>
+                                         
+                                           
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                      
                 <!-- Notifications Table -->
                 <div class="card card-body p-4 col-sm-12 col-lg-3">
                     <table id="datatablesSimple">

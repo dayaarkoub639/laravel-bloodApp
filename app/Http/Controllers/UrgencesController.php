@@ -180,26 +180,34 @@ class UrgencesController extends Controller
         ->where('idPersonne', $idUserPersonneAuth)
         ->value('id');
   
-           Demande::create([
-            'dateDemande' => Carbon::now(),
-            'lieuDemande' => "",
-            'serviceMedical' => "",
-            'groupageDemande' => $idGroupage,
-            'quantiteDemande' => 1,
-            'typeMaladie' => "",
-            'idDemandeur' => $idDemandeur,
-            'numeroDossierMedical' => "",
-            'notes' => "",
-            'typeDemande' => "urgent",
-        ]);
+        Demande::create([
+        'dateDemande' => Carbon::now(),
+        'lieuDemande' => "",
+        'serviceMedical' => "",
+        'groupageDemande' => $idGroupage,
+        'quantiteDemande' => 1,
+        'typeMaladie' => "",
+        'idDemandeur' => $idDemandeur,
+        'numeroDossierMedical' => "",
+        'notes' => "",
+        'nbreDonneursEnvoyes' => count( $donneursf),
+        'typeDemande' => "urgent",
+     ]);
 
         
         //step 03:  envoie les notifications aux donneurs trouvés
-       //TODO
-
-
-       //rediretion
     
+        foreach($donneursf as $donneur){
+            $eventData = [
+                'message' => "Demande de sang a été envoyé !",
+                'idDemandeur' => $idDemandeur,
+                'idCentreProche' => $this->getCentreProche($donneur['latitude'], $donneur['longitude']),
+                'idDonneur' => $donneur['idUser']
+
+            ];
+            // Diffuser l'événement 
+            broadcast(new BloodRequestEvent($eventData)); 
+        }
 
        return redirect()->back()->with('success', 'Demande(s) envoyée(d) avec succès.');;
     }

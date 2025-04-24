@@ -48,15 +48,13 @@
                 </h6>
 
                 <!-- Étoiles -->
-                <div class="mb-1 text-warning">
-                    @for ($i = 1; $i <= 5; $i++)
-                        @if ($i <= $donneur['note'])
-                            ★
-                        @else
-                            ☆
-                        @endif
-                    @endfor
-                </div>
+                @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= $donneur->user()->value('noteEtoile'))
+                                <span style="color: gold; font-size: 20px;">&#9733;</span>   
+                            @else
+                                <span style="color: lightgray; font-size: 20px;">&#9733;</span>  
+                            @endif
+                        @endfor
 
                 <!-- Ville -->
                 <small class="text-muted">

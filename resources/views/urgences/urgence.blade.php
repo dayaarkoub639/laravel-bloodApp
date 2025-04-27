@@ -88,7 +88,13 @@
                                 <table id="datatablesSimple">                                  
                                     <tbody>
                                         <tr>
-                                            <td><p class="static text-center mb-0">{{ count($donneurs)}}</p></td>
+                                            <td>
+                                                @if(count($donneurs)!=0)
+                                                <p class="static text-center mb-0">{{ count($donneurs)}}</p>
+                                                @else
+                                                <p class="static text-center mb-0">{{ $lastDemande->nbreDonneursEnvoyes}}</p>
+                                                @endif
+                                            </td>
                                                                                    
                                         </tr>                                 
                                      
@@ -97,14 +103,21 @@
                                              
                                         </tr>
                                         <tr>
-                                            <td><p class="static text-center mb-0">03</p></td>
+                                            <td>
+                                            @if(count($donneurs)!=0)
+                                                <p class="static text-center mb-0">0</p>
+                                                @else
+                                                <p class="static text-center mb-0">  {{count($lastDemande->personnes)}}   </p>
+                                                @endif
+                                             
+                                            </td>
                                            
                                            
                                         </tr>
                                    
                                      
                                         <tr>
-                                            <td class="text-center">Demandes</td>
+                                            <td class="text-center">Acceptée(s)</td>
                                          
                                            
                                         </tr>

@@ -3,7 +3,8 @@
 namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
- 
+use App\Models\Personne;
+
 class Admin extends Model{
   
     public $timestamps = true; 
@@ -23,5 +24,8 @@ class Admin extends Model{
     {
         return str_pad($value, 8, '0', STR_PAD_LEFT); // Ajoute des zéros devant si nécessaire
     }
- 
+    public function personne()
+    {
+       return $this->belongsTo(Personne::class, 'idPersonne', 'idUser');
+    }
 }

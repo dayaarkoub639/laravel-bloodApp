@@ -37,6 +37,8 @@ class Personne extends  Authenticatable
         'lieuNaissance',
         'epouseDe',
 
+        'dernierDateDon',
+        'serologie',
         'idGroupage',
         'wilaya_prof_id'  ,
         'commune_prof_id'  ,

@@ -28,9 +28,8 @@ class BloodRequestController extends Controller
         // Requête pour trouver les utilisateurs donneurs compatibles
         $donneurs = Personne:: where('idGroupage', $request->groupage)
             ->where('idUser', '!=', $request->idDemandeur)
-            ->whereHas('dons', function ($query) use ($dateLimite) {
-                $query->where('serologie', 0);
-            })
+            ->where('serologie', 0)
+            ->where('dernierDateDon', '>=', $threeMonthsAgo)
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->selectRaw(
@@ -39,7 +38,7 @@ class BloodRequestController extends Controller
                 sin( radians( latitude ) ) ) ) AS distance",
                 [$latitude, $longitude, $latitude]
             )
-            ->having('distance', '<', 100) // 20 km de rayon
+            ->having('distance', '<', 20) // 20 km de rayon
             
             ->get();
             
@@ -52,7 +51,7 @@ class BloodRequestController extends Controller
             // Si tu veux retourner avec distance triée, décommente et adapte ci-dessous :
         $donneurs = $donneurs->sortBy('distance')->values();
         $donneurs = $donneurs->take(3);
-        $donneursFiltres=[];
+   
         foreach ($donneurs as $donneur) {
            
             $donneur->distance = $this->calculerDistance($latitude, $longitude, $donneur->latitude, $donneur->longitude);
@@ -76,30 +75,8 @@ class BloodRequestController extends Controller
 
                 
                 // Diffuser l'événement 
-                
                 broadcast(new BloodRequestEvent($eventData)); 
-                
                 $donneur->dons = $donneur->dons()->get() ?? "";
-                // Vérifier si le donneur a des dons
-            if ($donneur->dons->isNotEmpty()) {
-                // Trier les dons par date décroissante et prendre le premier (le plus récent)
-                $latestDon = $donneur->dons->sortByDesc('date')->first();
-                
-                // Convertir la date du dernier don en instance de Carbon
-                $latestDate = Carbon::parse($latestDon->date);
-                
-                // Date actuelle
-                $currentDate = Carbon::now();
-                
-                // Calculer la différence entre la date actuelle et la date du dernier don
-                $diffInMonths = $latestDate->diffInMonths($currentDate);
-
-                // Vérifier si le dernier don est dans les 3 derniers mois
-                if ($diffInMonths <= 3) {
-                    // Ajouter le donneur à la liste des donneurs filtrés
-                    $donneursFiltres[] = $donneur;
-                }
-            }
         }
 
      
@@ -107,7 +84,7 @@ class BloodRequestController extends Controller
 
         return response()->json([
             'success' => true,
-            'donneurs' => $donneursFiltres
+            'donneurs' => $donneurs
 
         ]);
     }

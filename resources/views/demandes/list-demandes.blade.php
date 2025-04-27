@@ -181,7 +181,6 @@
                     
                       <h6 class="fw-semibold mb-0 ">  {{ $demande->demandeur->personne->nom }}  {{ $demande->demandeur->personne->prenom }}</h6>
                           <p class="small"> {{ $demande->demandeur->personne->numeroTlp1 }}</p>
-                      
 
                       </td>
                   </td>

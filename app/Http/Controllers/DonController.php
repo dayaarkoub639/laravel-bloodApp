@@ -71,7 +71,15 @@ class DonController extends Controller
               'persMedicaleSuperviser' =>  (int) $request->persMedicaleSuperviser  
               
               ]);
-  
+            //todo update table personne
+            // Récupération de la personne
+            $personne = Personne::where('idUser', $request->idDonneur)->firstOrFail();
+
+            // Mise à jour
+            $personne->serologie = $request->serologie;
+            $personne->dernierDateDon =$request->date;
+            $personne->save();
+
       
           return redirect()->route('membres')->with('success', 'Don ajouté avec succès.');
  
@@ -146,7 +154,14 @@ class DonController extends Controller
                 'idPersonneMedicale' => $request->persMedicale,
                 'persMedicaleSuperviser' => $request->persMedicaleSuperviser,
                 'sourceDon' => $request->sourceDon ]);
+  
+            // Récupération de la personne
+            $personne = Personne::where('idUser', $don->idDonneur)->firstOrFail();
 
+            // Mise à jour
+            $personne->serologie = $request->serologie;
+            $personne->dernierDateDon =$request->date;
+            $personne->save();
             return redirect('/membres/fiche/'.$don->idDonneur)->with('success', 'Don modifié avec succès !');
         } catch (\Exception $e) {
             return redirect('/membres/fiche/'.$don->idDonneur)->with('error', $e->getMessage());

@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Admin;
+use App\Models\personneMedicale;
 use App\Models\Groupage;
 
 class Demande extends Model
@@ -31,15 +33,31 @@ class Demande extends Model
     public function demandeur()
     {
 
-        //if user or admin or personnel medical
+        //get personneType of  idDemandeur depuis la table personnes( user or admin or personnel medical)
         //dd($this->idDemandeur)
+        //TODO
+        $personneType="";
+    if ($user = User::find($this->idDemandeur)) {
+        $personneType= "user";
+    }
 
-        if(true){
+    if ($admin = Admin::find($this->idDemandeur)) {
+        $personneType= "admin";
+    }
+
+    if ($medecin = personneMedicale::find($this->idDemandeur)) {
+        $personneType= "personneMedicale";
+    }
+
+    switch ($personneType) {
+        case 'user':
             return $this->belongsTo(User::class, 'idDemandeur');
-        }else{
+        case 'admin':
             return $this->belongsTo(Admin::class, 'idDemandeur');
-        }
+        case 'personneMedicale':
+            return $this->belongsTo(personneMedicale::class, 'idDemandeur');
       
+    } 
   
     }
    

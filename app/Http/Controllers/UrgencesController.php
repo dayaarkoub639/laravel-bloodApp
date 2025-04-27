@@ -19,13 +19,13 @@ class UrgencesController extends Controller
    public function index(){
     $listeGroupage= Groupage::all(); 
     $donneurs = [];
-    $totalDons = count($donneurs);
-    $totalDemandes = Demande::count();
+    $lastDemande =  Demande::latest()->first();
+
     $admin=Admin::where('idPersonne',Auth::user()->idUser)->first();
     $centre = DB::table('centres')->select('id', 'nom', 'latitude', 'longitude')->where('id',$admin->idCentre)->first();
     $pointA = ['lat' => $centre->latitude, 'lon' => $centre->longitude]; 
     $nomCentre =  $centre->nom; 
-    return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes",'pointA',"nomCentre"));
+    return view('urgences.urgence',compact("listeGroupage","donneurs", "lastDemande",'pointA',"nomCentre"));
    }
    public function searchByGroupage(Request $request)
    {
@@ -35,17 +35,17 @@ class UrgencesController extends Controller
            
        ]);
        $listeGroupage= Groupage::all(); 
-       $totalDons = Don::count();
-       $totalDemandes = Demande::count();
+      
        // Récupérer les donneurs ayant l'idGroupage donné avec leurs dons
-       $dateLimite = Carbon::now()->subMonths(3);
-            
+   
+       $threeMonthsAgo = Carbon::now()->subMonths(3);
             // Requête pour trouver les utilisateurs donneurs compatibles
             $donneurs = Personne::where('idGroupage', $request->idGroupage)
-            
-                ->whereHas('dons', function ($query) use ($dateLimite) {
+            ->where('serologie', 0)
+            ->where('dernierDateDon', '>=', $threeMonthsAgo)
+              /*  ->whereHas('dons', function ($query) use ($dateLimite) {
                     $query->where('serologie', 0);
-                })
+                })*/
                ->get();
                
               
@@ -82,7 +82,7 @@ class UrgencesController extends Controller
                 event(new BloodRequestEvent($eventData));
                  $donneur->dons = $donneur->dons()->get() ?? "";
                   // Vérifier si le donneur a des dons
-                if ($donneur->dons->isNotEmpty()) {
+              /*  if ($donneur->dons->isNotEmpty()) {
                     // Trier les dons par date décroissante et prendre le premier (le plus récent)
                     $latestDon = $donneur->dons->sortByDesc('date')->first();
                     
@@ -100,16 +100,16 @@ class UrgencesController extends Controller
                         // Ajouter le donneur à la liste des donneurs filtrés
                         $donneursFiltres[] = $donneur;
                     }
-                }
+                }*/
             }
-            $donneurs = $donneursFiltres??[];
-            
+            //$donneurs = $donneursFiltres??[];
+            $lastDemande =  Demande::latest()->first();
             $admin=Admin::where('idPersonne',Auth::user()->idUser)->first();
             $centre = DB::table('centres')->select('id', 'nom', 'latitude', 'longitude')->where('id',$admin->idCentre)->first();
             $pointA = ['lat' => $centre->latitude, 'lon' => $centre->longitude]; 
             $admin=Admin::where('idPersonne',Auth::user()->idUser)->first();
             $nomCentre =  $centre->nom; 
-            return view('urgences.urgence',compact("listeGroupage","donneurs","totalDons","totalDemandes",'pointA',"nomCentre"));;
+            return view('urgences.urgence',compact("listeGroupage","donneurs","lastDemande",'pointA',"nomCentre"));;
    }
    private function getCentreProche($lat, $lng)
    {
@@ -209,6 +209,6 @@ class UrgencesController extends Controller
             broadcast(new BloodRequestEvent($eventData)); 
         }
 
-       return redirect()->back()->with('success', 'Demande(s) envoyée(d) avec succès.');;
+       return redirect()->back()->with('success', 'Demande(s) envoyée(s) avec succès.');;
     }
 }

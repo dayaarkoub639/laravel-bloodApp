@@ -14,7 +14,7 @@ class personneMedicale extends Model{
         'idPersonne', 
         "fonction",
         'role'  ,
-        'idCentre'
+        'idCentre','idDemandeur'
     ];
 
     
@@ -26,6 +26,10 @@ class personneMedicale extends Model{
     public function personnee()
     {
         return $this->belongsTo(Personne::class, 'idPersonne', 'idUser');
+    }
+    public function personne()
+    {
+       return $this->belongsTo(Personne::class, 'idPersonne', 'idUser');
     }
 }
  

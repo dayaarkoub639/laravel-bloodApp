@@ -36,6 +36,7 @@ Route::get('/wilayas', [WilayaController::class, 'getWilayas']);
 Route::get('/get-pseudos/{idUser}', [RecoverPhoneNumberController::class, 'getPseudos']);
 Route::get('/get-last-dons/{idUser}', [RecoverPhoneNumberController::class, 'getLastDons']);
 Route::post('/validate-info-recover', [RecoverPhoneNumberController::class, 'validateInfoRecover']);
+Route::post('/recover-validate-number', [RecoverPhoneNumberController::class, 'recoverValidateInfo']);
  
 
 

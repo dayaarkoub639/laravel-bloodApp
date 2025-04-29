@@ -11,9 +11,12 @@ use App\Models\User;
 use App\Models\Pseudo;
 use App\Models\Don;
 use App\Models\Personne;
+use Illuminate\Validation\Rule;
 
 class RecoverPhoneNumberController extends Controller
 {
+
+   
   /**
      * Récupérer les pseudos des utilisateurs.
      */
@@ -79,6 +82,44 @@ class RecoverPhoneNumberController extends Controller
         }
     
         return $dates;
+    }
+
+    public function recoverValidateInfo(Request $request)
+    {
+        try {
+            
+        $personne = Personne::where('idUser',$request->idPersonne)->first();
+ 
+        $request->validate([
+            'idPersonne' => 'required',
+            'nouveauNumero' => [
+                'required',
+                'string',
+                Rule::unique('personnes', 'numeroTlp1')->ignore($personne->idUser, 'idUser'),
+            ],
+        ]);
+
+        $personne->numeroTlp1 = $request->nouveauNumero;
+        $personne->save();
+
+        return response()->json([
+            'message' => 'Numéro de téléphone mis à jour avec succès.',
+            'data' => $personne
+        ]);
+
+        } catch (\Exception $e) {
+            // Annuler la transaction en cas d'erreur
+            \DB::rollBack();
+
+            // Log l'erreur pour le débogage
+            Log::error('Erreur lors de la validation de l\'utilisateur : ' . $e->getMessage());
+
+            // Retourner une réponse d'erreur
+            return response()->json([
+                'message' => 'Une erreur est survenue lors de la validation de l\'utilisateur.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
     public function validateInfoRecover(Request $request) 
     {

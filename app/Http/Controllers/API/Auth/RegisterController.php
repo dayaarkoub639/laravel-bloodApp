@@ -14,7 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Log; 
 class RegisterController extends Controller
 {
     use HttpResponses;
@@ -23,7 +23,9 @@ class RegisterController extends Controller
 
         $part3 = str_pad(self::getNextSequence() , 5, '0', STR_PAD_LEFT); // Numéro séquentiel sur 5 digits
         $part2 = str_pad($wilaya_domicile_id, 2, '0', STR_PAD_LEFT); // De 01 à 58
-
+        if ($gender == 0) {
+            $gender = 2;
+        }
 
         return "{$gender}{$part2}{$part3}";
     }

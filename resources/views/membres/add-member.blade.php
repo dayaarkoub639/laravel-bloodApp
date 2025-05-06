@@ -4,7 +4,6 @@
 
 <div class="container-fluid">
 
-
     <form class="card-title fw-semibold mb-4" action="{{route('membres')}}">
         Ajouter un membre
         <button type="submit" class="mx-2 btn btn-sm btn-outline-primary"> Liste</button>
@@ -33,7 +32,7 @@
                     <div class="row">
                         <div class="form-group col">
                             <label for="nom" class="form-label">Nom</label>
-                            <input type="text" class="form-control" id="nom" name="nom">
+                            <input type="text" class="form-control" id="nom" name="nom" placeholder="Le nom ne doit pas contenir de chiffres, ni caractéres spéciaux." value="{{ old('nom') }}">
                             @if ($errors->has('nom'))
                             <small class="text text-danger">
                                 {{ $errors->first('nom') }}
@@ -43,7 +42,7 @@
 
                         <div class="form-group col">
                             <label for="prenom" class="form-label">Prénom</label>
-                            <input type="text" class="form-control" id="prenom" name="prenom">
+                            <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Le prénom ne doit pas contenir de chiffres, ni caractéres spéciaux." value="{{ old('prenom') }}">
                             @if ($errors->has('prenom'))
                             <small class="text text-danger">
                                 {{ $errors->first('prenom') }}
@@ -56,7 +55,7 @@
 
                         <div class="form-group col">
                             <label for="birthdaydate" class="form-label">Date de naissance</label>
-                            <input type="date" class="form-control" id="birthdaydate" name="birthdaydate">
+                            <input type="date" class="form-control" id="birthdaydate" name="birthdaydate" value="{{ old('birthdaydate') }}">
                             @if ($errors->has('birthdaydate'))
                             <small class="text text-danger">
                                 {{ $errors->first('birthdaydate') }}
@@ -66,21 +65,18 @@
 
                         <div class="form-group col">
                             <label for="lieuNaissance" class="form-label">Lieu de naissance</label>
-                            <input type="text" id="lieuNaissance" name="lieuNaissance" class="form-control"
-                                value="{{ old('lieuNaissance') }}">
+                            <input type="text" id="lieuNaissance" name="lieuNaissance" class="form-control" value="{{ old('lieuNaissance') }}">
                         </div>
-
 
                     </div> <br>
                     <div class="row">
-
 
                         <div class="form-group col">
                             <label for="gender" class="form-label">Civilité *</label>
                             <select id="gender" name="gender" class="form-select" onchange="toggleEpouseDe()">
                                 <option value="">Sélectionner la civilité *</option>
-                                <option value="1">Homme</option>
-                                <option value="0">Femme</option>
+                                <option value="1" {{ old('gender') == '1' ? 'selected' : '' }}>Homme</option>
+                                <option value="0" {{ old('gender') == '0' ? 'selected' : '' }}>Femme</option>
                             </select>
                             @if ($errors->has('gender'))
                             <small class="text text-danger">
@@ -91,15 +87,14 @@
 
                         <div class="form-group col" id="epousede_field" style="display: none;">
                             <label for="epousede" class="form-label">Épouse de</label>
-                            <input type="text" id="epousede" name="epouseDe" class="form-control"
-                                value="{{ old('epousede') }}">
+                            <input type="text" id="epousede" name="epouseDe" class="form-control" value="{{ old('epouseDe') }}">
                         </div>
                     </div>
                     <br>
                     <div class="row">
                         <div class="form-group col">
                             <label for="phone01" class="form-label">Téléphone principale</label>
-                            <input type="number" class="form-control" id="phone01" name="phone01">
+                            <input type="number" class="form-control" id="phone01" name="phone01" value="{{ old('phone01') }}">
                             @if ($errors->has('phone01'))
                             <small class="text text-danger">
                                 {{ $errors->first('phone01') }}
@@ -109,7 +104,7 @@
 
                         <div class="form-group col">
                             <label for="phone02" class="form-label">Téléphone secondaire </label>
-                            <input type="number" class="form-control" id="phone02" name="phone02">
+                            <input type="number" class="form-control" id="phone02" name="phone02" value="{{ old('phone02') }}">
                             @if ($errors->has('phone02'))
                             <small class="text text-danger">
                                 {{ $errors->first('phone02') }}
@@ -119,16 +114,16 @@
                     </div>
                     <br>
 
-
                     <div class="form-group">
                         <label for="adresseDomicile" class="form-label">Adresse (Domicile)</label>
-                        <textarea class="form-control" id="adresseDomicile" name="adresseDomicile"></textarea>
+                        <textarea class="form-control" id="adresseDomicile" name="adresseDomicile">{{ old('adresseDomicile') }}</textarea>
                         @if ($errors->has('adresseDomicile'))
                         <small class="text text-danger">
                             {{ $errors->first('adresseDomicile') }}
                         </small>
                         @endif
                     </div>
+
                     <br>
                     <div class="row">
                         <!-- Sélection de la Wilaya -->

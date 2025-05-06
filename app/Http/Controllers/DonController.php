@@ -6,6 +6,7 @@ use App\Models\Personne;
 use App\Models\Don;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class DonController extends Controller
 {
@@ -35,7 +36,8 @@ class DonController extends Controller
         
     
         try {
-            $request->validate([
+            // Validation des données
+            $validator = Validator::make($request->all(), [
                 'date'         => 'required|date',
                 //'lieuDon'      => 'required|string|max:255',
                 'Pds'          => 'nullable|numeric|min:0',
@@ -50,8 +52,13 @@ class DonController extends Controller
                 'persMedicaleSuperviser' => 'required|exists:personnelMedical,id',
             ]);
      
+        // Vérifier si la validation échoue
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
           // Créer une entrée dans la table `personne`
-          $personne = Don::create([
+          $don = Don::create([
               'numeroFlacon'=>$request->numeroFlacon,
               'idDonneur'=>$request->idDonneur,
             
@@ -81,15 +88,24 @@ class DonController extends Controller
             $personne->save();
 
       
-          return redirect()->route('membres')->with('success', 'Don ajouté avec succès.');
+             //add note automatique 
+        
+             if ($request->sourceDon !== "Ami") {
+                $user = User::where('keyIdUser', $request->idDonneur)->first();
+             
+                if($user->noteEtoile<5){
+                    $user->noteEtoile = $user->noteEtoile + 1;
+                    $user->save();
+                }
+               
+            }
+
+            return redirect('/membres/fiche/'.$don->idDonneur)->with('success', 'Don ajouté avec succès !');
+    
  
       } catch (\Exception $e) {
-        
-          // Retourner une réponse d'erreur
-          return response()->json([
-              'message' => 'Une erreur est survenue lors de la création de don.',
-              'error' => $e,
-          ], 500);
+        return redirect('/membres/fiche/'.$don->idDonneur)->with('error', $e->getMessage());
+         
       }
     }
     public function edit($id){
@@ -140,6 +156,27 @@ class DonController extends Controller
     {
        
         try{       
+          // Validation des données
+          $validator = Validator::make($request->all(), [
+            'date'         => 'required|date',
+            //'lieuDon'      => 'required|string|max:255',
+            'Pds'          => 'nullable|numeric|min:0',
+            'numeroFlacon' => 'required|string|max:50',
+            'C'            => 'nullable|string|max:50',
+            'TA'           => 'nullable|string|max:50',
+            'serologie'    => 'required|in:0,1',
+            'support'      => 'required|in:double,triple,quadruple',
+            'reactions'    => 'nullable|string',
+            'observations' => 'nullable|string',
+            'persMedicale' => 'required|exists:personnelMedical,id',
+            'persMedicaleSuperviser' => 'required|exists:personnelMedical,id',
+        ]);
+ 
+    // Vérifier si la validation échoue
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
+    }
+
             $don = Don::findOrFail($id);
             $don->update([
                 'date'         => $request->date,
@@ -158,10 +195,12 @@ class DonController extends Controller
             // Récupération de la personne
             $personne = Personne::where('idUser', $don->idDonneur)->firstOrFail();
 
-            // Mise à jour
+            // Mise à jour personne
             $personne->serologie = $request->serologie;
             $personne->dernierDateDon =$request->date;
             $personne->save();
+ 
+
             return redirect('/membres/fiche/'.$don->idDonneur)->with('success', 'Don modifié avec succès !');
         } catch (\Exception $e) {
             return redirect('/membres/fiche/'.$don->idDonneur)->with('error', $e->getMessage());

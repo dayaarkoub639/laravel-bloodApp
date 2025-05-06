@@ -63,6 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/modifier/{id}', [DemandeController::class, 'update'])->name('demandes.update');
         Route::get('/fiche/{id}', [DemandeController::class, 'show'])->name('fiche-demande');
         Route::get('/acceptees/{id}', [DemandeController::class, 'acceptesView'])->name('acceptesView');
+        Route::post('/searchAdvanced', [DemandeController::class, 'searchAdvanced'])->name('demandes.searchAdvanced');
 
         Route::delete('/supprimer/{id}', [DemandeController::class, 'destroy'])->name('demande.delete');
     });

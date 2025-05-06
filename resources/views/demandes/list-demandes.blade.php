@@ -126,11 +126,88 @@
     </div>
     @endif
 
-            <!--ICi recherche-->
+           <!-- Section de filtres -->
+    <div class="mb-4">
+        <div class="filter-section">
+            <form id="filterForm" action="{{ route('demandes.searchAdvanced') }}" method="POST">
+            @csrf
+                <div class="row">
+                    <!-- Filtre par période -->
+                    <div class="col-md-6 col-lg-6 mb-3">
+                        <label class="filter-title">Période</label>
+                        <div class="filter-buttons">
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="periode" id="periode24h" value="24h" {{ request('periode') == '24h' ? 'checked' : '' }}>
+                                <label class="btn btn-outline-primary btn-sm" for="periode24h">Pendant 24 h</label>
+                                
+                                <input type="radio" class="btn-check" name="periode" id="periode7j" value="7j" {{ request('periode') == '7j' ? 'checked' : '' }}>
+                                <label class="btn btn-outline-primary btn-sm" for="periode7j">Pendant une semaine</label>
+                                
+                                <input type="radio" class="btn-check" name="periode" id="periode15j" value="15j" {{ request('periode') == '15j' ? 'checked' : '' }}>
+                                <label class="btn btn-outline-primary btn-sm" for="periode15j">Pendant 2 semaines</label>
+                                
+                                <input type="radio" class="btn-check" name="periode" id="periode1m" value="1m" {{ request('periode') == '1m' ? 'checked' : '' }}>
+                                <label class="btn btn-outline-primary btn-sm" for="periode1m">Pendant un mois</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filtre par groupage sanguin -->
+                    <div class="col-md-6 col-lg-6 mb-3">
+                        <label for="groupage" class="filter-title">Groupage sanguin</label>
+                        <select id="groupage" name="groupage" class="form-select">
+                                    <option value="">Choisir le groupage</option>
+                                    @foreach ($listeGroupage as $value)
+                                        <option value="{{ $value->id }}" {{ old('groupage', request('groupage')) == $value->id ? 'selected' : '' }}>
+                                            {{ $value->type }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                    </div>
+                    
+                    
+                            <!-- Wilaya -->
+                            <div class="form-group col">
+                                <label for="wilaya" class="form-label">Wilaya</label>
+                                <select id="wilaya" name="wilaya" class="form-select">
+                                    <option value="">Sélectionner une wilaya</option>
+                                    @foreach ($listeWilayas as $wilaya)
+                                        <option value="{{ $wilaya->id }}" {{ old('wilaya', request('wilaya')) == $wilaya->id ? 'selected' : '' }}>
+                                            {{ $wilaya->name_ascii }}  - {{ $wilaya->id }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Commune -->
+                            <div class="form-group col">
+                                <label for="commune" class="form-label">Commune</label>
+                                <select id="commune" name="commune" class="form-select">
+                                    <option value="">Sélectionner une commune</option>
+                                    {{-- Remplissage dynamique avec JS/AJAX si besoin --}}
+                                </select>
+                            </div>
+                </div>
+                
+                <div class="d-flex justify-content-end mt-2">
+                   
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="ti ti-search"></i> Filtrer
+                    </button>
+                </div>
+            </form>
+            <form class="container" method="POST" action="{{ route('demandes.searchAdvanced') }}">    @csrf
+            <button type="submit" class="btn btn-sm btn-secondary me-2" id="resetFilters">
+                        <i class="ti ti-refresh"></i> Réinitialiser
+                    </button>
+        
+            </form>
+        </div>
+    </div>
     <div class="d-flex align-items-stretch">
     <div class="card w-100">
       <div class="card-body p-4">
-        
+         
         <div class="table-responsive">
           <table class="table text-nowrap mb-0 align-middle" id="order-listing" >
         
@@ -180,8 +257,8 @@
                       <td class="border-bottom-0">
                     
                       <h6 class="fw-semibold mb-0 ">  {{ $demande->demandeur->personne->nom }}  {{ $demande->demandeur->personne->prenom }}</h6>
-                          <p class="small"> {{ $demande->demandeur->personne->numeroTlp1 }}</p>
-
+                          <p class="small"> {{ $demande->demandeur->personne->numeroTlp1 }} {{ $demande->demandeur->personne->idUser }}   </p>
+ 
                       </td>
                   </td>
                       <td class="border-bottom-0">
@@ -235,8 +312,32 @@
   </div>
            
       </div>
- 
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+ 
+
+    $('#wilaya').change(function() {
+        var wilaya_id = $(this).val();
+       // Convertir le code wilaya en format 01, 02, etc.
+       var wilaya_code = wilaya_id.padStart(2, '0');
+        $('#commune').html('<option value="">Chargement...</option>');
+
+        if (wilaya_code) {
+            $.ajax({
+                url: '/api/communes/' + wilaya_code,
+                type: 'GET',
+                success: function(data) {
+                    $('#commune').html('<option value="">Sélectionner une commune</option>');
+                    $.each(data, function(index, commune) {
+                        $('#commune').append('<option value="' + commune.id + '">' + commune.commune_name + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#commune').html('<option value="">Sélectionner une wilaya d\'abord</option>');
+        }
+    });
+ 
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function () {

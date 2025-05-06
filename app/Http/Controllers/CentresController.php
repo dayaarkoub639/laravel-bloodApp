@@ -40,10 +40,10 @@ class CentresController extends Controller
             'numeroTlp2'  => 'nullable|string|max:15|regex:/^[0-9]+$/',
         ]);
        // Gérer l'upload de l'image
-    if ($request->hasFile('image')) {
-        $imagePath = $request->file('image')->store('images', 'public'); // Stockage
-    }
-        // Vérifier si la validation échoue
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public'); // Stockage
+        }
+            // Vérifier si la validation échoue
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
@@ -98,17 +98,17 @@ class CentresController extends Controller
 
   
    
-  // Mettre à jour les autres champs
-  $centre->update([
-    'nom'         => $request->nom,
-    'address'     => $request->address,
-    'wilaya'      => $request->wilaya,
-    'commune'     => $request->commune,
-    'longitude'=> $request->longitude,
-    'latitude'=> $request->latitude,
-    'numeroTlp1'  => $request->numeroTlp1,
-    'numeroTlp2'  => $request->numeroTlp2,
-]);
+        // Mettre à jour les autres champs
+        $centre->update([
+            'nom'         => $request->nom,
+            'address'     => $request->address,
+            'wilaya'      => $request->wilaya,
+            'commune'     => $request->commune,
+            'longitude'=> $request->longitude,
+            'latitude'=> $request->latitude,
+            'numeroTlp1'  => $request->numeroTlp1,
+            'numeroTlp2'  => $request->numeroTlp2,
+        ]);
        
         return redirect()->route('centres')->with('success', 'Centre mis à jour avec succès.');
   

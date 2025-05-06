@@ -39,7 +39,8 @@ class Don extends Model
         'sourceDon',
         'donIsNote',
         'idDonneur',
-        'idPersonneMedicale'
+        'idPersonneMedicale',
+        'persMedicaleSuperviser'
     ];
     public function getIdDonneurAttribute($value)
     {

@@ -61,6 +61,11 @@ class Demande extends Model
   
     }
    
+    public function demandeurUser()
+    {
+        return $this->belongsTo(User::class, 'idDemandeur');
+    }
+    
    
       public function groupage()
       {

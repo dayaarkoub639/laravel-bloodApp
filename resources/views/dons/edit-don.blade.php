@@ -145,7 +145,7 @@
         <option value="">Sélectionner</option>
         @foreach ($listePersonneMedicale as $persMedicale)
             <option value="{{ $persMedicale->id }}" 
-                {{ $don->idPersonneMedicaleSuperviser == $persMedicale->id ? 'selected' : '' }}>
+                {{ $don->persMedicaleSuperviser == $persMedicale->id ? 'selected' : '' }}>
                 {{ $persMedicale->personnee->nom }} {{ $persMedicale->personnee->prenom }} ({{ $persMedicale->fonction }})
             </option>
         @endforeach

@@ -29,7 +29,7 @@ class BloodRequestController extends Controller
         $donneurs = Personne:: where('idGroupage', $request->groupage)
             ->where('idUser', '!=', $request->idDemandeur)
             ->where('serologie', 0)
-            ->where('dernierDateDon', '>=', $threeMonthsAgo)
+            ->where('dernierDateDon', '>=', $dateLimite)
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
             ->selectRaw(
@@ -70,18 +70,12 @@ class BloodRequestController extends Controller
                     'user_id' =>  $donneur->idUser, 
                     'demandeurId' =>  $request->idDemandeur, 
                     'centreProche' =>  $donneur->centreProche, 
-
                 ];
-
-                
-                // Diffuser l'événement 
+               // Diffuser l'événement 
                 broadcast(new BloodRequestEvent($eventData)); 
                 $donneur->dons = $donneur->dons()->get() ?? "";
         }
-
-     
-        
-
+            
         return response()->json([
             'success' => true,
             'donneurs' => $donneurs

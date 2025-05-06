@@ -92,7 +92,7 @@
                                                 @if(count($donneurs)!=0)
                                                 <p class="static text-center mb-0">{{ count($donneurs)}}</p>
                                                 @else
-                                                <p class="static text-center mb-0">{{ $lastDemande->nbreDonneursEnvoyes}}</p>
+                                                <p class="static text-center mb-0">{{ $lastDemande->nbreDonneursEnvoyes ?? 0}}</p>
                                                 @endif
                                             </td>
                                                                                    
@@ -107,7 +107,7 @@
                                             @if(count($donneurs)!=0)
                                                 <p class="static text-center mb-0">0</p>
                                                 @else
-                                                <p class="static text-center mb-0">  {{count($lastDemande->personnes)}}   </p>
+                                                <p class="static text-center mb-0">  {{($lastDemande) ? count($lastDemande->personnes) : 0}}   </p>
                                                 @endif
                                              
                                             </td>

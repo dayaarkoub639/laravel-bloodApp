@@ -322,30 +322,7 @@
                                                 <i class="ti ti-trash" style="  font-size:16px;"></i>
                                             </button>
                                         </form>
-                                        @if($don->sourceDon!="Ami" && $don->donIsNote==false)
-                                        <form id="noter-form-{{ $don->idDon }}" class="d-inline"
-                                            action="{{ url('dons/noter/' . $don->idDon) }}" method="POST">
-                                            {{ csrf_field() }}
-                                            {{ method_field('PUT') }}
-
-                                            <button type="button" class="btn btn-sm btn-primary noter-btn"
-                                                data-id="{{ $don->idDon }}">
-                                                <i class="ti ti-star" style="color:white; font-size:16px;"></i>
-                                            </button>
-                                        </form>
-                                       @endif
-                                       @if($don->sourceDon!="Ami" && $don->donIsNote==true)
-                                        <form id="decrementerNote-form-{{ $don->idDon }}" class="d-inline"
-                                            action="{{ url('dons/decrementerNote/' . $don->idDon) }}" method="POST">
-                                            {{ csrf_field() }}
-                                            {{ method_field('PUT') }}
-
-                                            <button type="button" class="btn btn-sm btn-outline-primary decrementerNote-btn"
-                                                data-id="{{ $don->idDon }}">
-                                                <i class="ti ti-star-off" style=" font-size:16px;"></i>
-                                            </button>
-                                        </form>
-                                       @endif
+                                      
                                     </td>
                                 </tr>
                                 @endforeach

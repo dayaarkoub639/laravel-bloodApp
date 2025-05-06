@@ -82,13 +82,20 @@ class MembreController extends Controller
         if ($request->filled('search')) {
             $search = strtolower($request->input('search'));
 
-        $query->join('users', 'personnes.idUser', '=', 'users.keyIdUser')
-        ->where(function ($q) use ($search) {
-            $q->whereRaw('LOWER(personnes.nom) LIKE ?', ["%$search%"])
-              ->orWhereRaw('LOWER(personnes.prenom) LIKE ?', ["%$search%"])
-              ->orWhereRaw('LOWER(personnes.idUser) LIKE ?', ["%$search%"])
-              ->orWhereRaw('LOWER(users.pseudo) LIKE ?', ["%$search%"]);
+       
+        $query->where(function ($q) use ($search) {
+            $q->whereRaw('LOWER(idUser) LIKE ?', ["%$search%"])
+            ->orWhereRaw('LOWER(nom) LIKE ?', ["%$search%"])
+            ->orWhereRaw('LOWER(prenom) LIKE ?', ["%$search%"])
+            ->orWhereHas('user', function ($q2) use ($search) {
+                $q2->whereRaw('LOWER(pseudo) LIKE ?', ["%$search%"]);
+            });
+            ;
         });
+
+       //recherche par pseudo
+
+         
     }
         $users = $query->get();
       
@@ -111,6 +118,9 @@ class MembreController extends Controller
 
         $part3 = str_pad(self::getNextSequence(), 5, '0', STR_PAD_LEFT); // Numéro séquentiel sur 5 digits
         $part2 = str_pad($wilaya_domicile_id, 2, '0', STR_PAD_LEFT); // De 01 à 58
+        if ($gender == 0) {
+            $gender = 2;
+        }
         return "{$gender}{$part2}{$part3}";
     }
 
@@ -131,37 +141,49 @@ class MembreController extends Controller
 
 
         try {
-            // Définir les règles de validation
-            $validator = Validator::make($request->all(), [
-                'nom' => 'required|string|max:255',
-                'prenom' => 'required|string|max:255',
-                'birthdaydate' => 'required|date',
-                'lieuNaissance' => 'required|string|max:255',
-                'gender' => 'required|in:0,1',
-                'phone01' => 'required|numeric|digits:10',
-                'phone02' => 'nullable|numeric|digits:10',
-                'adresseDomicile' => 'required|string|max:255',
-                'wilayaDomicile' => 'required|exists:wilayas,id',
-                'communeDomicile' => 'required|exists:communes,id',
-                'adresseProfessionnelle' => 'required|string|max:255',
-                'wilayaProfessionnelle' => 'required|exists:wilayas,id',
-                'communeProfessionnelle' => 'required|exists:communes,id',
-                'observations' => 'nullable|string',
-                'groupage' => 'nullable',
-                'phenotypeCmaj' => 'nullable|in:0,1',
-                'phenotypeEmaj' => 'nullable|in:0,1',
-                'phenotypeCmin' => 'nullable|in:0,1',
-                'phenotypeEmin' => 'nullable|in:0,1',
-                'phenotypeKell' => 'nullable|in:0,1',
-                'type_personne' => 'required|in:user,admin,personnelMedical',
-                'motDePasse' => 'required|string|min:8|confirmed',
-                'idCentre' => 'nullable', // Si applicable
-            ]);
+         // Définir les règles de validation
+$validator = Validator::make($request->all(), [
+    'nom'                  => ['required', 'string', 'max:255', 'regex:/^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/u'],
+    'prenom'               => ['required', 'string', 'max:255', 'regex:/^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/u'],
+    'birthdaydate'         => 'required|date',
+    'lieuNaissance'        => 'required|string|max:255',
+    'gender'               => 'required|in:0,1',
+    'phone01'              => 'required|numeric|digits:10',
+    'phone02'              => 'nullable|numeric|digits:10',
+    'adresseDomicile'      => 'required|string|max:255',
+    'wilayaDomicile'       => 'required|exists:wilayas,id',
+    'communeDomicile'      => 'required|exists:communes,id',
+    'adresseProfessionnelle'   => 'required|string|max:255',
+    'wilayaProfessionnelle'    => 'required|exists:wilayas,id',
+    'communeProfessionnelle'   => 'required|exists:communes,id',
+    'observations'         => 'nullable|string',
+    'groupage'             => 'nullable',
+    'phenotypeCmaj'        => 'nullable|in:0,1',
+    'phenotypeEmaj'        => 'nullable|in:0,1',
+    'phenotypeCmin'        => 'nullable|in:0,1',
+    'phenotypeEmin'        => 'nullable|in:0,1',
+    'phenotypeKell'        => 'nullable|in:0,1',
+    'type_personne'        => 'required|in:user,admin,personnelMedical',
+    'motDePasse'           => 'required|string|min:8|confirmed',
+    'idCentre'             => 'nullable', // Si applicable
+]);
 
-            // Si la validation échoue, on retourne les erreurs à la page précédente
-            if ($validator->fails()) {
-                return back()->withErrors($validator)->withInput();
-            }
+// Messages personnalisés (optionnel)
+$messages = [
+    'nom.regex'    => 'Le nom ne doit contenir que des lettres, des espaces ou des tirets.',
+    'prenom.regex' => 'Le prénom ne doit contenir que des lettres, des espaces ou des tirets.',
+];
+
+// Valider avec les messages personnalisés
+$validator->setCustomMessages($messages);
+
+if ($validator->fails()) {
+    return back()
+           ->withErrors($validator)
+           ->withInput();
+}
+
+         
 
 
             // Commencer une transaction

@@ -42,31 +42,31 @@ class DemandeController extends Controller
         }
  
           // Groupage sanguin
-          if ($request->filled('groupage')) {
+        if ($request->filled('groupage')) {
             $query->where('groupageDemande', $request->input('groupage'));
         }
         
         // Wilaya et commune
-     if ($request->filled('wilaya')) {
-        $wilayaId = (int) $request->wilaya;
-        $communeId = (int) $request->commune;
-            $query 
-            ->join('users', 'demandes.idDemandeur', '=', 'users.id')
-            ->join('personnes', 'users.keyIdUser', '=', 'personnes.idUser')
-            ->when($request->filled('wilaya'), function ($q) use ($request,$communeId) {
-                $wilayaId = $request->wilaya;
-                $q->where(function ($subQuery) use ($wilayaId,$communeId) {
-                    $subQuery->where('personnes.wilaya_domicile_id', $wilayaId)
-                            ->orWhere('personnes.wilaya_prof_id', $wilayaId);
-                         
-                            if ($communeId) {
-                                $subQuery->orWhere('personnes.commune_domicile_id', $communeId)
-                                         ->orWhere('personnes.commune_prof_id', $communeId);
-                            }
-                });
-            })
-            ->select('demandes.*');        
-    }
+        if ($request->filled('wilaya')) {
+            $wilayaId = (int) $request->wilaya;
+            $communeId = (int) $request->commune;
+                $query 
+                ->join('users', 'demandes.idDemandeur', '=', 'users.id')
+                ->join('personnes', 'users.keyIdUser', '=', 'personnes.idUser')
+                ->when($request->filled('wilaya'), function ($q) use ($request,$communeId) {
+                    $wilayaId = $request->wilaya;
+                    $q->where(function ($subQuery) use ($wilayaId,$communeId) {
+                        $subQuery->where('personnes.wilaya_domicile_id', $wilayaId)
+                                ->orWhere('personnes.wilaya_prof_id', $wilayaId);
+                            
+                                if ($communeId) {
+                                    $subQuery->orWhere('personnes.commune_domicile_id', $communeId)
+                                            ->orWhere('personnes.commune_prof_id', $communeId);
+                                }
+                    });
+                })
+                ->select('demandes.*');        
+         }
  
        
 
@@ -87,27 +87,23 @@ class DemandeController extends Controller
         $listeGroupage= Groupage::all(); 
         return view('demandes.list-demandes',compact('demandes','listeGroupage','listeWilayas','listeCommune'));
     }
+
     public function add(){
         $listeGroupage= Groupage::all(); 
         $users=User::all();
         return view('demandes.add',compact('users','listeGroupage'));
-     }
-
-   
-    /**
-     * Enregistre une nouvelle demande.
-     */
+    }
+     
+     
     public function store(Request $request)
     {
         // Validation des données
         $request->validate([
             'dateDemande' => 'required|date',
-           
             'lieuDemande' => 'required|string|max:255',
             'serviceMedical' => 'required|string|max:255',
             'groupageDemande' => 'required|exists:groupage,id',
             'quantiteDemande' => 'required|integer|min:1',
-           
             'typeMaladie' => 'required|string|max:255',
             'idDemandeur' => 'required',
             'numeroDossierMedical' => 'nullable|string|max:255',
@@ -159,16 +155,14 @@ class DemandeController extends Controller
             // Validation des données
             $request->validate([
                 'dateDemande' => 'required|date',
-                 
-               /* 'lieuDemande' => 'string|max:255',
+                'lieuDemande' => 'required|string|max:255',
                 'serviceMedical' => 'required|string|max:255',
                 'groupageDemande' => 'required|exists:groupage,id',
                 'quantiteDemande' => 'required|integer|min:1',
-               
                 'typeMaladie' => 'required|string|max:255',
                 'idDemandeur' => 'required',
                 'numeroDossierMedical' => 'nullable|string|max:255',
-                'notes' => 'nullable|string',*/
+                'notes' => 'nullable|string',
             ]);
 
             // Récupération et mise à jour

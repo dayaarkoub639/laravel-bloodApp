@@ -35,7 +35,7 @@ class RegisterController extends Controller
        
        // $lastRecord = Personne::orderBy('idUser', 'desc')->noCache()->first();
         // Si vous avez un champ timestamp
-$lastRecord = Personne::latest('created_at')->first();
+        $lastRecord = Personne::latest('created_at')->first();
         $lastRecord= $lastRecord->fresh();
         if (!$lastRecord) {
             return 1;

@@ -172,10 +172,10 @@ class DonController extends Controller
             'persMedicaleSuperviser' => 'required|exists:personnelMedical,id',
         ]);
  
-    // Vérifier si la validation échoue
-    if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
-    }
+            // Vérifier si la validation échoue
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
 
             $don = Don::findOrFail($id);
             $don->update([

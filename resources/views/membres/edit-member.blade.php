@@ -131,8 +131,8 @@
                     <div class="form-group">
                         <label for="adresseDomicile" class="form-label">Adresse (Domicile)</label>
                         <textarea class="form-control" id="adresseDomicile" name="adresseDomicile">
-    {{ $personne->adresse }}
-    </textarea>
+                            {{ $personne->adresse }}
+                            </textarea>
                         @if ($errors->has('adresseDomicile'))
                         <small class="text text-danger">
                             {{ $errors->first('adresseDomicile') }}
@@ -166,9 +166,9 @@
                         </div>
                         <script>
                             // Définir la variable JavaScript depuis Blade
-    var selectedCommuneDomicile = {{ $personne->commune_domicile_id ?? 'null' }};
-    var selectedWilayaDomicile = {{ $personne->wilaya_domicile_id ?? 'null' }};
-    var selectedCivilite = {{ $personne->gender ?? 'null' }};
+                            var selectedCommuneDomicile = {{ $personne->commune_domicile_id ?? 'null' }};
+                            var selectedWilayaDomicile = {{ $personne->wilaya_domicile_id ?? 'null' }};
+                            var selectedCivilite = {{ $personne->gender ?? 'null' }};
 
                         </script>
                     </div>
@@ -176,8 +176,8 @@
                     <div class="form-group">
                         <label for="adresseProfessionnelle" class="form-label">Adresse (Professionnelle)</label>
                         <textarea class="form-control" id="adresseProfessionnelle" name="adresseProfessionnelle">
-    {{ $personne->adressePro }}
-    </textarea>
+                            {{ $personne->adressePro }}
+                            </textarea>
                         @if ($errors->has('adresseProfessionnelle'))
                         <small class="text text-danger">
                             {{ $errors->first('adresseProfessionnelle') }}
@@ -213,8 +213,8 @@
 
                     <script>
                         // Définir la variable JavaScript depuis Blade
-    var selectedCommuneProfessionnelle = {{ $personne->commune_prof_id ?? 'null' }};
-    var selectedWilayaProfessionnelle = {{ $personne->wilaya_prof_id ?? 'null' }};
+                        var selectedCommuneProfessionnelle = {{ $personne->commune_prof_id ?? 'null' }};
+                        var selectedWilayaProfessionnelle = {{ $personne->wilaya_prof_id ?? 'null' }};
 
                     </script>
                     <br>
@@ -222,8 +222,7 @@
 
                     <div class="form-group mb-3">
                         <label for="observations" class="form-label">Observations médicales</label>
-                        <textarea class="form-control" id="observations" name="observations">{{ $personne->observations }}
-    </textarea>
+                        <textarea class="form-control" id="observations" name="observations">{{ $personne->observations }}  </textarea>
                         @if ($errors->has('observations'))
                         <small class="text text-danger">
                             {{ $errors->first('observations') }}

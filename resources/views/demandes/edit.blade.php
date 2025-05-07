@@ -3,7 +3,7 @@
 @include('layouts.public.header')
 
 <div class="container-fluid">   
-   <form class="card-title fw-semibold mb-4" action="{{route('demandes.liste')}}">
+   <form class="card-title fw-semibold mb-4" action="{{ route('demandes.liste') }}">
         Modifier une demande
         <button type="submit" class="mx-2 btn btn-sm btn-outline-primary">Liste</button>
    </form>
@@ -14,35 +14,36 @@
 
         <div class="mb-3">
             <label for="dateDemande" class="form-label">Date de la demande</label>
-            <input type="date" class="form-control" id="dateDemande" name="dateDemande" value="{{ $demande->dateDemande }}" required>
+            <input type="date" class="form-control" id="dateDemande" name="dateDemande"
+                   value="{{ old('dateDemande', $demande->dateDemande) }}" required>
         </div>
-
-   
 
         <div class="mb-3">
             <label for="lieuDemande" class="form-label">Lieu de la demande</label>
-            <input type="text" class="form-control" id="lieuDemande" name="lieuDemande" value="{{ $demande->lieuDemande }}" required>
+            <input type="text" class="form-control" id="lieuDemande" name="lieuDemande"
+                   value="{{ old('lieuDemande', $demande->lieuDemande) }}" required>
         </div>
 
         <div class="mb-3">
             <label for="serviceMedical" class="form-label">Service médical</label>
-            <input type="text" class="form-control" id="serviceMedical" name="serviceMedical" value="{{ $demande->serviceMedical }}" required>
+            <input type="text" class="form-control" id="serviceMedical" name="serviceMedical"
+                   value="{{ old('serviceMedical', $demande->serviceMedical) }}" required>
         </div>
 
         <div class="mb-3"> 
-            <div class="form-group {{ $errors->has('groupage') ? 'has-error' : '' }}">
+            <div class="form-group {{ $errors->has('groupageDemande') ? 'has-error' : '' }}">
                 <label for="groupage" class="form-label text-center">Groupage sanguin</label>
                 <select id="groupage" name="groupageDemande" class="form-select" required>
                     <option value="">Choisir le groupage</option>
                     @foreach ($listeGroupage as $value)
-                        <option value="{{ $value->id }}" {{ $demande->groupageDemande == $value->id ? 'selected' : '' }}>
+                        <option value="{{ $value->id }}" {{ old('groupageDemande', $demande->groupageDemande) == $value->id ? 'selected' : '' }}>
                             {{ $value->type }}
                         </option>
                     @endforeach
                 </select> 
-                @if ($errors->has('groupage'))
+                @if ($errors->has('groupageDemande'))
                     <small class="text text-danger">
-                        {{ $errors->first('groupage') }}
+                        {{ $errors->first('groupageDemande') }}
                     </small>
                 @endif
             </div>
@@ -50,13 +51,14 @@
 
         <div class="mb-3">
             <label for="quantiteDemande" class="form-label">Quantité demandée</label>
-            <input type="number" class="form-control" id="quantiteDemande" name="quantiteDemande" value="{{ $demande->quantiteDemande }}" required>
+            <input type="number" class="form-control" id="quantiteDemande" name="quantiteDemande"
+                   value="{{ old('quantiteDemande', $demande->quantiteDemande) }}" required>
         </div>
 
-      
         <div class="mb-3">
             <label for="typeMaladie" class="form-label">Type de maladie</label>
-            <input type="text" class="form-control" id="typeMaladie" name="typeMaladie" value="{{ $demande->typeMaladie }}" required>
+            <input type="text" class="form-control" id="typeMaladie" name="typeMaladie"
+                   value="{{ old('typeMaladie', $demande->typeMaladie) }}" required>
         </div>
 
         <div class="mb-3">
@@ -64,8 +66,8 @@
             <select id="idDemandeur" name="idDemandeur" class="form-select">
                 <option value="">Sélectionner</option>
                 @foreach ($users as $user)
-                    <option value="{{ $user->id }}" {{ $demande->idDemandeur == $user->id ? 'selected' : '' }}>
-                        {{ $user->personne()->value("nom") }} {{ $user->personne()->value("prenom") }}
+                    <option value="{{ $user->id }}" {{ old('idDemandeur', $demande->idDemandeur) == $user->id ? 'selected' : '' }}>
+                        {{ $user->personne()->value('nom') }} {{ $user->personne()->value('prenom') }}
                     </option>
                 @endforeach
             </select>
@@ -73,24 +75,24 @@
 
         <div class="mb-3">
             <label for="numeroDossierMedical" class="form-label">Numéro de dossier médical</label>
-            <input type="text" class="form-control" id="numeroDossierMedical" name="numeroDossierMedical" value="{{ $demande->numeroDossierMedical }}">
+            <input type="text" class="form-control" id="numeroDossierMedical" name="numeroDossierMedical"
+                   value="{{ old('numeroDossierMedical', $demande->numeroDossierMedical) }}">
         </div>
 
         <div class="mb-3">
             <label for="notes" class="form-label">Notes</label>
-            <textarea class="form-control" id="notes" name="notes">{{ $demande->notes }}</textarea>
+            <textarea class="form-control" id="notes" name="notes">{{ old('notes', $demande->notes) }}</textarea>
         </div>
         
         <button type="button" class="btn btn-outline-primary" onclick="window.history.back();">Annuler</button>
-
-        <button type="button" class="mx-3 btn btn-primary" id="confirm-edit">  Modifier  </button>
-       
+        <button type="button" class="mx-3 btn btn-primary" id="confirm-edit">Modifier</button>
     </form>
 </div> 
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('confirm-edit').addEventListener('click', function () {
-            let form = document.getElementById('form' );
+            let form = document.getElementById('form');
             Swal.fire({
                 title: "Confirmer la modification ?",
                 text: "Voulez-vous vraiment modifier cet élément ?",
@@ -102,7 +104,7 @@
                 cancelButtonText: "Annuler"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    form.submit();// Soumet le formulaire
+                    form.submit();
                 }
             });
         });

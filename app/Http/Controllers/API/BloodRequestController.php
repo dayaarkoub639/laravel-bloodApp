@@ -36,7 +36,7 @@ class BloodRequestController extends Controller
             $request->validate([
                 'groupage' => 'required|string',
                 'currentUserPosition' => 'required|string',
-                'idDemandeur' => 'required|integer', // Expect integer for idDemandeur
+                'idDemandeur' => 'required|int',  
             ]);
 
             Log::info('Request validation passed');
@@ -372,7 +372,7 @@ class BloodRequestController extends Controller
 
     public function accepterDemande(Request $request) {
         $validator = Validator::make($request->all(), [
-            'idUser' => 'required|integer', // Donor's ID, ensure it's an integer
+            'idUser' => 'required|string', 
             'idDemande' => 'required|exists:demandes,id'
         ]);
 
@@ -469,7 +469,7 @@ class BloodRequestController extends Controller
     public function getRequestStatus(Request $request, $id) {
         try {
             $validator = Validator::make($request->all(), [
-                'idDemandeur' => 'required|integer', // Ensure it's an integer
+                'idDemandeur' => 'required|integer', 
             ]);
 
             if ($validator->fails()) {
@@ -526,7 +526,7 @@ class BloodRequestController extends Controller
 
     public function updatePhone(Request $request) {
         $validator = Validator::make($request->all(), [
-            'idPersonne' => 'required|integer|exists:personnes,idUser',  // Ensure integer and exists
+            'idPersonne' => 'required|string|exists:personnes,idUser',  // Ensure integer and exists
             'numeroTlp1' => [
                 'required',
                 'string',
@@ -569,7 +569,7 @@ class BloodRequestController extends Controller
     public function updateFcmToken(Request $request)
     {
         $request->validate([
-            'idUser' => 'required|integer|exists:personnes,idUser', // Ensure integer and exists
+            'idUser' => 'required|string|exists:personnes,idUser', 
             'fcm_token' => 'required|string',
         ]);
 

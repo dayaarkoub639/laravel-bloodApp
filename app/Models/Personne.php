@@ -51,7 +51,8 @@ class Personne extends  Authenticatable
         'cMin',
         'eMaj',
         'eMin',
-        'kell'
+        'kell',
+        'fcm_token'
     ];
 
 

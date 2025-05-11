@@ -23,6 +23,8 @@ Route::post('/update-location', [BloodRequestController::class, 'updateLocation'
 Route::post('/updatePhone', [BloodRequestController::class, 'updatePhone']);
 
 Route::get('/request-status/{id}', [BloodRequestController::class, 'getRequestStatus']);
+ 
+Route::post('/update-fcm-token', [BloodRequestController::class, 'updateFcmToken']);
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('register',  [RegisterController::class, 'register']);
@@ -44,7 +46,7 @@ Route::post('/recover-validate-number', [RecoverPhoneNumberController::class, 'r
 /*
 Route::group(['middleware' => 'api.auth'], function () {
     Route::get('user', [LoginController::class, 'details']);
-    Route::get('logout', [LoginController::class, 'logout']);
+    Route::get('logout', [LoginController::class, 'logout']); 
 
 
 });*/

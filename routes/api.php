@@ -22,6 +22,7 @@ Route::post('/find-donors', [BloodRequestController::class, 'findNearbyDonors'])
 Route::post('/update-location', [BloodRequestController::class, 'updateLocation']);
 Route::post('/updatePhone', [BloodRequestController::class, 'updatePhone']);
 
+Route::get('/request-status/{id}', [BloodRequestController::class, 'getRequestStatus']);
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('register',  [RegisterController::class, 'register']);

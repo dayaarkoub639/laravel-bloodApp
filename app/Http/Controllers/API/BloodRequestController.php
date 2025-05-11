@@ -178,53 +178,77 @@ class BloodRequestController extends Controller
     }
 
     public function accepterDemande(Request $request){
-         // Validation des données
-         $validator = Validator::make($request->all(), [
+        // Validation des données
+        $validator = Validator::make($request->all(), [
             'idUser' => 'required',
             'idDemande' => 'required'
         ]);
-
+    
         if ($validator->fails()) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
                 'errors' => $validator->errors()
             ], 422);
         }
-
+    
         try {
             $personne = Personne::where('idUser',$request->idUser)->first();
+            if (!$personne) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Donor not found'
+                ], 404);
+            }
+            
             $demande_id = $request->idDemande;
+            $demande = Demande::find($demande_id);
+            if (!$demande) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request not found'
+                ], 404);
+            }
             
-            
+            // Record the acceptance
             $personne->demandes()->syncWithoutDetaching([
                 $demande_id => ['date_acceptation' => now()]
             ]);
-
-            // Créer la notification dans la base de données
-            
-               // Préparer les données pour l'événement
-               $eventData = [
-             
-                'message' => "Demande acceptée !",
-                'idDemandeur' => $demande_id,
-                'idCentreProche' => $this->getCentreProche($personne->latitude, $personne->longitude),
-                'idPersonne' => $request->idUser
-
+    
+            // Get the center information
+            $centreProche = $this->getCentreProche($personne->latitude, $personne->longitude);
+    
+            // Prepare data for the notification to the original requester
+            $eventData = [
+                'message' => "Your blood request has been accepted!",
+                'idDemandeur' => $demande->idDemandeur, // Original requester
+                'idDonateur' => $request->idUser,
+                'idCentreProche' => $centreProche,
+                'type' => 'acceptance'
             ];
-
+    
+            // Broadcast to the original requester
+            $originalRequester = Personne::where('idUser', $demande->idDemandeur)->first();
+            if ($originalRequester) {
+                broadcast(new BloodRequestEvent([
+                    'user_id' => $demande->idDemandeur,
+                    'data' => $eventData
+                ]));
+            }
             
-            // Diffuser l'événement 
-            
-            broadcast(new BloodRequestEvent($eventData)); 
             return response()->json([
                 'success' => true,
-                'message' => 'Demande accepté',
-                'centreProche' =>$this->getCentreProche($personne->latitude, $personne->longitude),
+                'message' => 'Request accepted successfully',
+                'centreProche' => $centreProche,
                 'demande_id' => $demande_id,
+                'requesterInfo' => [
+                    'id' => $demande->idDemandeur,
+                    'groupageDemande' => $demande->groupageDemande,
+                    'dateDemande' => $demande->dateDemande,
+                ]
             ]);
         } catch (\Exception $e) {
+            Log::error('Error accepting blood request: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Server error',
@@ -232,7 +256,70 @@ class BloodRequestController extends Controller
             ], 500);
         }
     }
-
+    public function getRequestStatus(Request $request, $id) {
+        try {
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'idDemandeur' => 'required',
+            ]);
+    
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+    
+            // Find the request
+            $demande = Demande::find($id);
+            
+            if (!$demande) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Request not found'
+                ], 404);
+            }
+            
+            // Check if the requester is the owner of this request
+            if ($demande->idDemandeur != $request->idDemandeur) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access to this request'
+                ], 403);
+            }
+            
+            // Get all donors who accepted
+            $acceptedDonors = DB::table('demande_personne')
+                ->where('demande_id', $id)
+                ->join('personnes', 'demande_personne.personne_id', '=', 'personnes.idUser')
+                ->leftJoin('users', 'personnes.idUser', '=', 'users.keyIdUser')
+                ->select(
+                    'personnes.idUser',
+                    'users.pseudo',
+                    'personnes.numeroTlp1',
+                    'demande_personne.date_acceptation'
+                )
+                ->get();
+            
+            // Build response
+            return response()->json([
+                'success' => true,
+                'requestDetails' => $demande,
+                'acceptedDonors' => $acceptedDonors,
+                'totalAccepted' => count($acceptedDonors)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching request status: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Server error',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     
     public function updatePhone(Request $request){
         

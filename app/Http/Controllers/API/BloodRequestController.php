@@ -69,7 +69,7 @@ class BloodRequestController extends Controller
                 ->whereNotNull('latitude')
                 ->whereNotNull('longitude')
                 ->where(function ($query) {
-                    $query->where('serologie', 0)
+                    $query->where('serologie', "Négatif")
                           ->orWhereNull('serologie');
                 })
                 ->where(function ($query) use ($dateLimite) {
@@ -371,53 +371,109 @@ class BloodRequestController extends Controller
     }
 
     public function accepterDemande(Request $request) {
+        Log::info('AccepterDemande: Request received.', ['request_data' => $request->all()]);
+
         $validator = Validator::make($request->all(), [
-            'idUser' => 'required|string', 
-            'idDemande' => 'required|exists:demandes,id'
+            'idUser' => 'required|string', // Assuming idUser in Personne can be string or is castable by DB/Eloquent
+            'idDemande' => 'required|integer|exists:demandes,id' // Ensure idDemande is integer
         ]);
 
         if ($validator->fails()) {
+            Log::warning('AccepterDemande: Validation failed.', [
+                'errors' => $validator->errors(),
+                'request_data' => $request->all()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
                 'errors' => $validator->errors()
             ], 422);
         }
+        Log::info('AccepterDemande: Validation passed.');
 
         try {
-            $personneDonor = Personne::where('idUser', $request->idUser)->first();
+            $donorId = $request->idUser;
+            $demandeId = $request->idDemande;
+
+            Log::info('AccepterDemande: Processing acceptance.', ['donor_id' => $donorId, 'demande_id' => $demandeId]);
+
+            $personneDonor = Personne::where('idUser', $donorId)->first();
             if (!$personneDonor) {
+                Log::error('AccepterDemande: Donor (Personne) not found.', ['donor_id' => $donorId]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Donor (Personne) not found'
                 ], 404);
             }
+            Log::info('AccepterDemande: Donor found.', ['donor_id' => $personneDonor->idUser, 'donor_details' => $personneDonor->toArray()]);
 
-            $demande = Demande::find($request->idDemande);
+            $demande = Demande::find($demandeId);
+            if (!$demande) {
+                Log::error('AccepterDemande: Demande not found.', ['demande_id' => $demandeId]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Blood request (Demande) not found'
+                ], 404);
+            }
+            Log::info('AccepterDemande: Demande found.', ['demande_id' => $demande->id, 'idDemandeur' => $demande->idDemandeur]);
 
+            // Check if already accepted to prevent issues or re-notification
+            $alreadyAccepted = DB::table('demande_personne')
+                                ->where('demande_id', $demandeId)
+                                ->where('personne_id', $personneDonor->id) // Assuming 'personne_id' is the foreign key for Personne's primary key
+                                ->exists();
+            
+            if ($alreadyAccepted) {
+                Log::info('AccepterDemande: Donor has already accepted this request.', ['donor_id' => $donorId, 'demande_id' => $demandeId]);
+                // You might want to return a specific message or just success if re-accepting is okay.
+                // For now, let's proceed but this is a good place for business logic.
+            }
+
+
+            Log::info('AccepterDemande: Attaching donor to demande via pivot table.');
+            // Ensure 'demandes' relationship is defined in Personne model
+            // and 'personnes' relationship in Demande model for many-to-many
             $personneDonor->demandes()->syncWithoutDetaching([
-                $request->idDemande => ['date_acceptation' => now()]
+                $demandeId => ['date_acceptation' => now()]
             ]);
+            Log::info('AccepterDemande: Donor attached to demande successfully.');
 
             $centreProche = "Unknown Center";
             if (is_numeric($personneDonor->latitude) && is_numeric($personneDonor->longitude)) {
-                $centreProche = $this->getCentreProche($personneDonor->latitude, $personneDonor->longitude);
+                try {
+                    $centreProche = $this->getCentreProche($personneDonor->latitude, $personneDonor->longitude);
+                    Log::info('AccepterDemande: Calculated nearest center for donor.', ['centre' => $centreProche]);
+                } catch (\Exception $e) {
+                    Log::warning('AccepterDemande: Error calculating nearest center for donor.', ['donor_id' => $donorId, 'error' => $e->getMessage()]);
+                }
+            } else {
+                Log::warning('AccepterDemande: Donor has invalid coordinates for center calculation.', ['donor_id' => $donorId]);
             }
 
             $requesterPersonne = Personne::where('idUser', $demande->idDemandeur)->first();
-
-            if ($requesterPersonne) {
+            if (!$requesterPersonne) {
+                Log::error('AccepterDemande: Requester (Personne) not found for notification.', ['idDemandeur' => $demande->idDemandeur]);
+                // Continue to return success to the donor, but log that requester wasn't notified.
+            } else {
+                Log::info('AccepterDemande: Requester found for notification.', ['requester_id' => $requesterPersonne->idUser]);
                 $notificationTitle = 'Blood Request Accepted!';
-                $donorPseudo = $personneDonor->user->pseudo ?? 'N/A'; // Safe access
-                $notificationBody = "Donor {$personneDonor->idUser} (Pseudo: {$donorPseudo}) has accepted your request for blood group {$demande->groupageDemande}.";
+                // Ensure 'user' relationship and 'pseudo' attribute exist and are loaded, or handle nulls
+                $donorPseudo = $personneDonor->user->pseudo ?? ($personneDonor->pseudo ?? $personneDonor->idUser); 
+                $notificationBody = "Donor {$donorPseudo} has accepted your request for blood group {$demande->groupageDemande}.";
+                
                 $notificationData = [
-                    'type' => 'request_accepted',
+                    'type' => 'acceptance', // Changed from 'request_accepted' to match Flutter FCMService
                     'requestId' => (string) $demande->id,
                     'donorId' => (string) $personneDonor->idUser,
-                    'donorPseudo' => $donorPseudo,
+                    'donorPseudo' => (string) $donorPseudo, // Ensure string
                     'centreProcheDonor' => $centreProche,
+                    // Add any other relevant data for the requester
                 ];
-                Log::info("Preparing to notify requester {$requesterPersonne->idUser} for demand {$demande->id}");
+                Log::info("AccepterDemande: Preparing to notify requester.", [
+                    'requester_id' => $requesterPersonne->idUser, 
+                    'demande_id' => $demande->id,
+                    'notification_data' => $notificationData
+                ]);
 
                 if (!empty($requesterPersonne->fcm_token)) {
                     try {
@@ -426,29 +482,36 @@ class BloodRequestController extends Controller
                             ['title' => $notificationTitle, 'body' => $notificationBody],
                             $notificationData
                         );
-                        Log::info("FCM acceptance notification sent to requester {$requesterPersonne->idUser}");
+                        Log::info("AccepterDemande: FCM acceptance notification sent to requester.", ['requester_id' => $requesterPersonne->idUser]);
                     } catch (\Exception $e) {
-                        Log::error("Failed to send FCM acceptance to requester {$requesterPersonne->idUser}: " . $e->getMessage());
+                        Log::error("AccepterDemande: Failed to send FCM acceptance to requester.", [
+                            'requester_id' => $requesterPersonne->idUser, 
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString() // Log trace for FCM errors
+                        ]);
                     }
                 } else {
-                     Log::warning("Requester {$requesterPersonne->idUser} has no FCM token for acceptance notification.");
+                     Log::warning("AccepterDemande: Requester has no FCM token for acceptance notification.", ['requester_id' => $requesterPersonne->idUser]);
                 }
 
+                // Broadcasting event (e.g., for Pusher)
                 try {
-                    broadcast(new BloodRequestEvent([
-                        'user_id' => $demande->idDemandeur,
-                        'message' => $notificationBody,
-                        'data' => $notificationData
+                    broadcast(new BloodRequestEvent([ // Ensure BloodRequestEvent can handle this structure
+                        'user_id' => $demande->idDemandeur, // Target the requester
+                        'message' => $notificationBody,    // A summary message
+                        'data' => $notificationData       // The detailed payload
                     ]));
-                    Log::info("Acceptance event broadcast to requester_id: {$demande->idDemandeur}");
+                    Log::info("AccepterDemande: Acceptance event broadcast to requester.", ['requester_id' => $demande->idDemandeur]);
                 } catch (\Exception $e) {
-                    Log::error("Failed to broadcast acceptance event to requester {$demande->idDemandeur}: " . $e->getMessage());
+                    Log::error("AccepterDemande: Failed to broadcast acceptance event to requester.", [
+                        'requester_id' => $demande->idDemandeur, 
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
                 }
-
-            } else {
-                Log::warning("Could not find requester (Personne) with ID {$demande->idDemandeur} to send acceptance notification.");
             }
 
+            Log::info('AccepterDemande: Process completed successfully.', ['donor_id' => $donorId, 'demande_id' => $demandeId]);
             return response()->json([
                 'success' => true,
                 'message' => 'Request accepted successfully. Requester has been notified.',
@@ -457,10 +520,14 @@ class BloodRequestController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error accepting blood request: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AccepterDemande: Unhandled error accepting blood request.', [
+                'error' => $e->getMessage(), 
+                'trace' => $e->getTraceAsString(), // Crucial for 500 errors
+                'request_data' => $request->all()
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Server error while accepting request.',
+                'message' => 'Server error while accepting request. Please try again later.',
             ], 500);
         }
     }

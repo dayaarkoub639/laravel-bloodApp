@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use App\Models\User;
-use App\Models\Personne;
+use App\Models\personneMedical;
 use App\Models\Commune;
 use App\Models\Don;
 use App\Models\Demande;
@@ -67,7 +67,7 @@ class Personne extends  Authenticatable
 
       public function personneMedical()
     {
-        return $this->hasOne(PersonneMedical::class, 'idPersonne', 'idUser');
+        return $this->hasOne(personneMedicale::class, 'idPersonne', 'idUser');
     }
       // Relation one-to-one avec le modèle User
       public function user()

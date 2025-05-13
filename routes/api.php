@@ -23,7 +23,8 @@ Route::post('/update-location', [BloodRequestController::class, 'updateLocation'
 Route::post('/updatePhone', [BloodRequestController::class, 'updatePhone']);
 
 Route::get('/request-status/{id}', [BloodRequestController::class, 'getRequestStatus']);
- 
+ Route::post('/user-requests', [BloodRequestController::class, 'getUserRequests']);
+
 Route::post('/update-fcm-token', [BloodRequestController::class, 'updateFcmToken']);
 
 Route::post('login', [LoginController::class, 'login']);

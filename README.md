@@ -19,8 +19,6 @@
 - php artisan db:seed 
 - php artisan storage:link 
 
-
-### Pour faire fonctionner le pusher (boostsrap.js)
  - npm install
  - npm run build
 

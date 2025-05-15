@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Groupage;
 use App\Models\Wilaya;
 use App\Models\Commune;
-use App\Models\personneMedicale;
+use App\Models\PersonneMedicale;
 use App\Models\admin;
 use App\Models\Don;
 use App\Models\Centre;
@@ -250,7 +250,7 @@ if ($validator->fails()) {
             }
             if ($request->type_personne == "personnelMedical") {
                 // Créer une entrée dans la table `users`
-                $user = personneMedicale::create([
+                $user = PersonneMedicale::create([
                     'idPersonne' => $idCustom,
                     'fonction' => $request->fonction,
                     'role' =>  $request->role,
@@ -294,7 +294,7 @@ if ($validator->fails()) {
             $sousPersonne = Admin::where("idPersonne", $id)->first();
         }
         if ($personne->typePersonne == "personnelMedical") {
-            $sousPersonne = personneMedicale::where("idPersonne", $id)->first();
+            $sousPersonne = PersonneMedicale::where("idPersonne", $id)->first();
         }
 
         return view('membres.edit-member', compact('listeGroupage', 'listeWilayas', 'listeCommune', "personne", "sousPersonne", "listeCentres"));
@@ -368,9 +368,9 @@ if ($validator->fails()) {
             ]);
         }
         if ($personne->typePersonne == "personnelMedical") {
-            $personneMedicale = personneMedicale::where('idPersonne', $id)->first();
+            $PersonneMedicale = PersonneMedicale::where('idPersonne', $id)->first();
 
-            $personneMedicale->update([
+            $PersonneMedicale->update([
 
                 'fonction' => $request->fonction,
                 'role' =>  $request->role,
@@ -404,7 +404,7 @@ if ($validator->fails()) {
                 $admin->delete();
             }
             if ($personne->typePersonne == "personnelMedical") {
-                $personnelMedical = personneMedicale::where("idPersonne", $id)->first();
+                $personnelMedical = PersonneMedicale::where("idPersonne", $id)->first();
                 $personnelMedical->delete();
             }
             $personne->delete();

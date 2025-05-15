@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Personne;
  
-class personneMedicale extends Model{
+class PersonneMedicale extends Model{
   
     public $timestamps = true; 
     protected $table = 'personnelMedical'; 

@@ -37,9 +37,9 @@
             <div class="card text-center shadow-sm p-3">
                 <div class="card-body">
                     <div class="mb-2">
-                        <i class="ti ti-heartbeat text-danger" style=" font-size: 3rem !important;"></i>
+                        <i class="ti ti-user text-danger" style=" font-size: 3rem !important;"></i>
                     </div>
-                    <h3 class="fw-bold">5,634</h3>
+                    <h3 class="fw-bold">{{$nbrUtilisateurs}}</h3>
                     <p class="mb-0 fw-semibold">Utilisateurs enregistrés</p>
                 </div>
             </div>
@@ -50,7 +50,7 @@
                     <div class="mb-2">
                         <i class="ti ti-droplet text-danger" style=" font-size: 3rem !important;"></i>
                     </div>
-                    <h3 class="fw-bold">5,634</h3>
+                    <h3 class="fw-bold">{{$nbrDonneurs}}</h3>
                     <p class="mb-0 fw-semibold">Donneurs enregistrés</p>
                 </div>
             </div>
@@ -61,7 +61,7 @@
                     <div class="mb-2">
                         <i class="ti ti-list text-danger" style=" font-size: 3rem !important;"></i>
                     </div>
-                    <h3 class="fw-bold">5,634</h3>
+                    <h3 class="fw-bold">{{$nbrUtilisateurs}}</h3>
                     <p class="mb-0 fw-semibold">Demandes de don</p>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                     <div class="mb-2">
                         <i class="ti ti-heartbeat text-danger" style=" font-size: 3rem !important;"></i>
                     </div>
-                    <h3 class="fw-bold">5,634</h3>
+                    <h3 class="fw-bold">{{$nbrDons}}</h3>
                     <p class="mb-0 fw-semibold">Dons complétés</p>
                 </div>
             </div>
@@ -84,16 +84,7 @@
     <div class="row">
             <div class="col-sm-6 col-md-4 mb-4">
             
-                        @php
-                            $groupes = [
-                                ['type' => 'A+', 'nombre' => '1,380'],
-                                ['type' => 'B-', 'nombre' => '640'],
-                                ['type' => 'B+', 'nombre' => '1,420'],
-                                ['type' => 'AB+', 'nombre' => '780'],
-                                ['type' => 'AB-', 'nombre' => '280'],
-                                ['type' => 'O+', 'nombre' => '1,620'],
-                            ];
-                        @endphp
+                       
 
                         <div class="card shadow-sm">
                             <div class="card-header ">
@@ -102,10 +93,11 @@
                             <div class="card-body p-0">
                                 <table class="table mb-0 table-striped text-center">
                                     <tbody>
-                                        @foreach ($groupes as $groupe)
+                                     
+                                        @foreach($groupes as $groupe)
                                             <tr>
-                                                <td>{{ $groupe['type'] }}</td>
-                                                <td>{{ $groupe['nombre'] }}</td>
+                                                <td>{{ $groupe->type }}</td>
+                                                <td>{{ $groupe->personnes_count }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -118,7 +110,9 @@
             <div class="col-sm-6 col-md-8 mb-4">
                 <div class="card">
                     <div class="card-header">Statistiques géographiques par année</div>
-                    <div class="card-body"> </div>
+                    <div class="card-body"> 
+                    <canvas id="statChart" width="600" height="300"></canvas>
+                    </div>
                 </div>
             </div>
         
@@ -127,7 +121,7 @@
                 <h4 class="my-4">Demandes et utilisateurs</h4>
                 <div class="row">
                     <div class="col  mb-4">
-                        <canvas id="myBarChart" width="100%" ></canvas> 
+                        <canvas id="donChart" width="100%" ></canvas> 
                     </div>   
                 </div> 
             </div>
@@ -142,56 +136,82 @@
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
         crossorigin="anonymous"></script>
      
-<script>
-    // Set new default font family and font color to mimic Bootstrap's default styling
-Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-Chart.defaults.global.defaultFontColor = '#292b2c';
+        <script>
+        const ctx = document.getElementById('donChart').getContext('2d');
 
- 
-// Bar Chart Example
-var ctx = document.getElementById("myBarChart");
-var myLineChart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin","Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Décembre"],
-    datasets: [{
-      label: "Revenue",
-      backgroundColor: "rgba(2,117,216,1)",
-      borderColor: "rgba(2,117,216,1)",
-      data: [4215, 5312, 6251, 7841, 9821, 14984,5312,7141,4915,18987,2312,8841],
-    }],
-  },
-  options: {
-    scales: {
-      xAxes: [{
-        time: {
-          unit: 'month'
-        },
-        gridLines: {
-          display: false
-        },
-        ticks: {
-          maxTicksLimit: 12
-        }
-      }],
-      yAxes: [{
-        ticks: {
-          min: 0,
-          max: 15000,
-          maxTicksLimit: 5
-        },
-        gridLines: {
-          display: true
-        }
-      }],
-    },
-    legend: {
-      display: false
-    }
-  }
-});
+        const donChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [
+                    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+                ],
+                datasets: [
+                    {
+                        label: 'Série 1',
+                        data: [20, 27, 24, 35, 36, 30, 33, 29, 25, 28, 34, 32],
+                        borderColor: 'cyan',
+                        backgroundColor: 'cyan',
+                        tension: 0.3,
+                        fill: false,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    },
+                    {
+                        label: 'Série 2',
+                        data: [12, 20, 20, 30, 30, 28, 31, 27, 23, 26, 30, 29],
+                        borderColor: '#36a2eb',
+                        backgroundColor: '#36a2eb',
+                        tension: 0.3,
+                        fill: false,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 50
+                    }
+                }
+            }
+        });
+   
+        const ctx2 = document.getElementById('statChart').getContext('2d');
 
- 
-
-</script>
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: [
+                    'Utilisateur enregistrés',
+                    'Donneurs enregistrés',
+                    'Demandes de don',
+                    'Dons complétés'
+                ],
+                datasets: [
+                    {
+                        label: 'Année 2023',
+                        data: [3, 7, 15, 20],
+                        backgroundColor: '#4bc0c0'
+                    },
+                    {
+                        label: 'Année 2024',
+                        data: [6, 9, 17, 24],
+                        backgroundColor: '#36a2eb'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 25
+                    }
+                }
+            }
+        });
+    </script>
 @endsection

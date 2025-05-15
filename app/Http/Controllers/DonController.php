@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\personneMedicale;
+use App\Models\PersonneMedicale;
 use App\Models\Personne;
 use App\Models\Don;
 use App\Models\User;
@@ -23,7 +23,7 @@ class DonController extends Controller
         return view('dons.list', compact('donneurs'));
     }
     public function add($idPersonne){
-        $listePersonneMedicale=personneMedicale::all();
+        $listePersonneMedicale=PersonneMedicale::all();
 
         return view('dons.add-don',compact("idPersonne","listePersonneMedicale"));
        
@@ -110,7 +110,7 @@ class DonController extends Controller
     }
     public function edit($id){
         $don = Don::where('idDon', $id)->first();
-        $listePersonneMedicale=personneMedicale::all();
+        $listePersonneMedicale=PersonneMedicale::all();
      
         return view('dons.edit-don',compact( "listePersonneMedicale","don"));
      }

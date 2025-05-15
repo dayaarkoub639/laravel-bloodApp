@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Admin;
-use App\Models\personneMedicale;
+use App\Models\PersonneMedicale;
 use App\Models\Groupage;
 
 class Demande extends Model
@@ -45,8 +45,8 @@ class Demande extends Model
         $personneType= "admin";
     }
 
-    if ($medecin = personneMedicale::find($this->idDemandeur)) {
-        $personneType= "personneMedicale";
+    if ($medecin = PersonneMedicale::find($this->idDemandeur)) {
+        $personneType= "PersonneMedicale";
     }
 
     switch ($personneType) {
@@ -54,8 +54,8 @@ class Demande extends Model
             return $this->belongsTo(User::class, 'idDemandeur');
         case 'admin':
             return $this->belongsTo(Admin::class, 'idDemandeur');
-        case 'personneMedicale':
-            return $this->belongsTo(personneMedicale::class, 'idDemandeur');
+        case 'PersonneMedicale':
+            return $this->belongsTo(PersonneMedicale::class, 'idDemandeur');
       
     } 
   

@@ -22,7 +22,8 @@
 
 ### Pour faire fonctionner le pusher (boostsrap.js)
  - npm install
- - npm run build
+ - 
+ 
 
 ### Lancer le serveur 
 - php artisan serve

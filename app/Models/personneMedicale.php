@@ -8,7 +8,7 @@ use App\Models\Personne;
 class PersonneMedicale extends Model{
   
     public $timestamps = true; 
-    protected $table = 'personnelMedical'; 
+    protected $table = 'personnel_medical'; 
 
     protected $fillable = [
         'idPersonne', 
